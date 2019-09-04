@@ -1,0 +1,26 @@
+{
+  "name": "socket.io-app",
+  "version": "1.0.0",
+  "description": "an app based socket.io",
+  "main": "./dist/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "./node_modules/.bin/tsc && node ./dist/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yeqown/socket.io-app.git"
+  },
+  "keywords": [
+    "socket.io"
+  ],
+  "author": "yeqown@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yeqown/socket.io-app/issues"
+  },
+  "homepage": "https://github.com/yeqown/socket.io-app#readme",
+  "devDependencies": {
+    "typescript": "^3.6.2"
+  }
+}
