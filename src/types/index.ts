@@ -9,7 +9,7 @@ interface Session {
     meta: object,
 }
 
-interface Onoff {
+interface IOnoff {
     token: string // AuthReq 中的 Token
     meta: object // AuthReq 中的 Meta
     evtTyp: string // 事件类型: connect, disconnect(tcpclean)
@@ -18,20 +18,41 @@ interface Onoff {
     clientIp: string // 客户端IP
 }
 
-interface AuthReq {
+interface IAuthReq {
     token: string,
     userId: number,
     meta: object,
 }
 
-interface AuthReply {
+class AuthReq implements IAuthReq {
+    token: string
+    userId: number
+    meta: object
 
+    constructor(userId: Required<number>, token: Required<string>, meta: object) {
+        this.token = token
+        this.userId = userId
+        this.meta = meta
+    }
+}
+interface IAuthReply {
+    errmsg: string,
+    errcode: number,
 }
 
+class AuthReply implements IAuthReply {
+    errcode: number
+    errmsg: string
+
+    constructor(errcode: Required<number>, errmsg: Required<string>) {
+        this.errcode = errcode
+        this.errmsg = errmsg
+    }
+}
 
 interface Err {
     errCode: number,
     errMsg: string,
 }
 
-export { Session, Onoff, AuthReq, AuthReply, Err, proto }
+export { Session, IOnoff, IAuthReq, AuthReq, IAuthReply, AuthReply, Err, proto }

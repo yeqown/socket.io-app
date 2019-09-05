@@ -1,8 +1,8 @@
-interface Message {
+interface IMessage {
     ver: string,
     meta: object,
     evt: string,
     id: string,
 }
 
-export { Message, }
+export { IMessage, }
