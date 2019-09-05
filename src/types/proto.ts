@@ -5,5 +5,4 @@ interface Message {
     id: string,
 }
 
-
 export { Message, }

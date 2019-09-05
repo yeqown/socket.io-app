@@ -28,4 +28,10 @@ interface AuthReply {
 
 }
 
-export { Session, Onoff, AuthReq, AuthReply, proto }
+
+interface Err {
+    errCode: number,
+    errMsg: string,
+}
+
+export { Session, Onoff, AuthReq, AuthReply, Err, proto }

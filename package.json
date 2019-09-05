@@ -4,7 +4,8 @@
   "description": "an app based socket.io",
   "main": "./dist/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "./node_modules/.bin/mocha ./tests/**",
+    "build": "rm -fr ./dist && ./node_modules/.bin/tsc && cp -r ./src/codegen/api/*.js ./dist/codegen/api",
     "dev": "./node_modules/.bin/tsc && node ./dist/main.js"
   },
   "repository": {
@@ -21,6 +22,18 @@
   },
   "homepage": "https://github.com/yeqown/socket.io-app#readme",
   "devDependencies": {
+    "@types/node": "^12.7.4",
+    "grpc-tools": "^1.8.0",
+    "grpc_tools_node_protoc_ts": "^2.5.4",
+    "mocha": "^6.2.0",
+    "protobufjs": "^6.8.8",
     "typescript": "^3.6.2"
+  },
+  "dependencies": {
+    "@grpc/proto-loader": "^0.5.2",
+    "@types/google-protobuf": "^3.7.1",
+    "google-protobuf": "^3.9.1",
+    "grpc": "^1.23.3",
+    "socket.io": "^2.2.0"
   }
 }
