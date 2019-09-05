@@ -1,8 +1,13 @@
 import { initialSocketio, initialRPC } from './server'
 import { Options, SocketioWrapper } from './server/socketio'
 import { Options as gOptions, gRPCService } from './server/grpc'
+import { configureLogger, logger } from './utils/logger'
+import path from 'path'
 
 function main() {
+
+    configureLogger(path.join(__dirname, "../confs/log4js.json"))
+
     let opt: Options = { port: 3000, path: "/socket.io" }
     let s: SocketioWrapper = initialSocketio(opt)
     s.serve()
@@ -13,3 +18,8 @@ function main() {
 }
 
 main()
+
+// recovery for nodejs
+process.on("uncaughtException", (err) => {
+    logger.error(err);
+})

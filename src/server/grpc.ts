@@ -1,6 +1,7 @@
 import grpc, { GrpcObject } from "grpc"
 import grpc_pb from '../codegen/api/api_grpc_pb'
 import api_pb from "../codegen/api/api_pb";
+import { logger } from '../utils/logger'
 
 interface Options {
     port: number
@@ -11,8 +12,7 @@ class gRPCService {
     // _srv: grpc.Server
 
     constructor(opt: Options) {
-        console.log("init gRPCService with opt: ", opt);
-
+        logger.info("init gRPCService with opt: ", opt);
         this.port = opt.port
     }
 
@@ -39,10 +39,10 @@ class gRPCService {
             cb(new Error(), resp)
             return
         }
-        console.log("broadcast message: ", msg, msg.getId(), msg.getVer());
+        logger.info("broadcast message: ", msg, msg.getId(), msg.getVer());
         resp.setErrcode(0)
         resp.setErrmsg("ok")
-        console.log("resp is: ", resp.getErrcode(), resp.getErrmsg());
+        logger.info("resp is: ", resp.getErrcode(), resp.getErrmsg());
         cb(null, resp)
     }
 
