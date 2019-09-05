@@ -1,4 +1,5 @@
 import * as proto from './proto'
+import { IRedisClientAsync } from './redis-async'
 
 interface Session {
     userId: number,
@@ -55,4 +56,8 @@ interface Err {
     errMsg: string,
 }
 
-export { Session, IOnoff, IAuthReq, AuthReq, IAuthReply, AuthReply, Err, proto }
+export {
+    Session, IOnoff, IAuthReq, AuthReq, IAuthReply, AuthReply, Err,
+    proto,
+    IRedisClientAsync,
+}
