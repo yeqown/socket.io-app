@@ -11,9 +11,9 @@ function initialSocketio(opt: Options, rc: IRedisClientAsync): SocketioWrapper {
     return s
 }
 
-function initialRPC(opt: gOptions): gRPCService {
+function initialRPC(opt: gOptions, srv: SocketioWrapper): gRPCService {
     // console.log("initialRPC service with opt:", opt);
-    let s = new gRPCService(opt)
+    let s = new gRPCService(opt, srv)
     return s
 }
 

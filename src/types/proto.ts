@@ -1,4 +1,6 @@
 import { v4 } from 'uuid'
+import { Message as pbMessage } from '../codegen/api/api_pb'
+import { logger } from '../utils/logger'
 
 interface IMessage {
     ver: Required<string>,
@@ -7,18 +9,29 @@ interface IMessage {
     id: Required<string>,
 }
 
-
 class Message implements IMessage {
     ver: string
-    meta: object
+    meta: any
     evt: string
     id: string
 
-    constructor(meta: object, ver: string = '1.0.0', id: string = '', evt: string = 'message') {
+    constructor(meta?: any, ver: string = '1.0.0', id: string = '', evt: string = 'message') {
         this.ver = ver
         this.id = id || v4()
         this.evt = evt
         this.meta = meta
+    }
+
+    loadFromPb(pbm: pbMessage | undefined): IMessage {
+        if (pbm === undefined) {
+            logger.error("meet an undefined api_pb.Message")
+            return this
+        }
+        this.meta = pbm.getMeta()
+        this.ver = pbm.getVer()
+        this.evt = pbm.getEvt()
+        this.id = pbm.getId() || v4()
+        return this
     }
 }
 

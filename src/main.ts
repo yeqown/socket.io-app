@@ -63,7 +63,7 @@ const run = (log4jsConf: string, conf: Required<string>) => {
 
     // Step: gRPC server
     let opt2: gOptions = { port: 3001 }
-    let s2: gRPCService = initialRPC(opt2)
+    let s2: gRPCService = initialRPC(opt2, s)
     s2.serve()
 }
 

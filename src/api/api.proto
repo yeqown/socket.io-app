@@ -14,7 +14,8 @@ service SocketMService {
 }
 
 message NspBroadcastReq {
-    Message msg = 1;
+    string nspName = 1;
+    Message msg = 2;
 }
 
 message NspBroadcastResp {
@@ -22,9 +23,14 @@ message NspBroadcastResp {
     string errmsg = 2;
 }
 
-message NspRoomsBroadcastReq {
-    repeated string rooms = 1;
+message RoomMessage {
+    string roomId = 1;
     Message msg = 2;
+}
+
+message NspRoomsBroadcastReq {
+    string nspName = 1;
+    repeated RoomMessage msgs = 2;
 }
 
 message NspRoomsBroadcastResp {
@@ -32,11 +38,15 @@ message NspRoomsBroadcastResp {
     string errmsg = 2;
 }
 
-message NspUsersBroadcastReq {
-    repeated int64 users = 1;
+message UserMessage {
+    int64 userId = 1;
     Message msg = 2;
 }
 
+message NspUsersBroadcastReq {
+    string nspName = 1;
+    repeated UserMessage msgs = 2;
+}
 
 message NspUsersBroadcastResp {
     uint32 errcode = 1;
@@ -64,7 +74,7 @@ message ClearRoomResp {
 
 message Message {
     string ver = 1;
-    // google.protobuf.Any meta = 2;
+    // Any meta = 2;
     string meta = 2;
     string evt = 3;
     string id = 4;

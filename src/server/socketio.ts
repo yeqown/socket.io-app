@@ -114,11 +114,22 @@ class SocketioWrapper {
 
                 socket.on("disconnect", (d) => {
                     logger.info("disconnect socketId: ", socket.id, "args:", d)
+                    socket.leaveAll()
                     this._sockets.delete(socket.id)
                 })
 
                 socket.on("auth", (d) => {
                     logger.info("auth socketId: ", socket.id, "args:", d)
+                    socket.emit("login", {})
+                })
+
+                // TODO: fix data type
+                socket.on("join", (rooms: string[]) => {
+                    logger.info("recv join evt: ", socket.id, rooms)
+                    rooms.forEach(roomId => {
+                        logger.info("socket join room", roomId)
+                        socket.join(roomId)
+                    })
                 })
 
                 socket.on("chat/users", (uMsg: IUsersMessage) => {
@@ -129,6 +140,7 @@ class SocketioWrapper {
                 })
 
                 socket.on("chat/broadcast_rooms", (rMsg: IRoomsMessage) => {
+                    logger.info("recv broadcast_rooms msg", rMsg)
                     _nsp.in(rMsg.roomId).emit(rMsg.msg.evt, rMsg.msg)
                 })
 
@@ -242,7 +254,7 @@ class NspConfiger implements INspConfiger {
     // TODO:
     allNsp(): INspConfig[] {
         let nspCfgs = new Array<NpsConfig>()
-        nspCfgs.push(new NpsConfig("demo", ["chat", "ban", "join"]))
+        nspCfgs.push(new NpsConfig("demo", ["chat", "ban"]))
         return nspCfgs
     }
 

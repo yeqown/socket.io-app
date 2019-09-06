@@ -3,6 +3,8 @@ import grpc_pb from '../codegen/api/api_grpc_pb'
 import api_pb from "../codegen/api/api_pb";
 import { logger } from '../utils/logger'
 import { codes, getMessage } from '../utils/codes'
+import { SocketioWrapper } from "./socketio";
+import { proto } from "../types";
 
 interface Options {
     port: number
@@ -10,11 +12,13 @@ interface Options {
 
 class gRPCService {
     port: number
+    _socketioSrv: SocketioWrapper
     // _srv: grpc.Server
 
-    constructor(opt: Options) {
+    constructor(opt: Options, socketioSrv: SocketioWrapper) {
         logger.info("init gRPCService with opt: ", opt);
         this.port = opt.port
+        this._socketioSrv = socketioSrv
     }
 
     serve = () => {
@@ -47,20 +51,53 @@ class gRPCService {
         cb(null, resp)
     }
 
-    nspRoomsBroadcast = (call: grpc.ServerUnaryCall<api_pb.NspRoomsBroadcastReq>, callback: grpc.requestCallback<api_pb.NspRoomsBroadcastResp>) => {
+    nspRoomsBroadcast = (call: grpc.ServerUnaryCall<api_pb.NspRoomsBroadcastReq>, cb: grpc.requestCallback<api_pb.NspRoomsBroadcastResp>) => {
+        let msgs = call.request.getMsgsList()
+        let nspName = call.request.getNspname()
+        let resp = new api_pb.NspBroadcastResp()
+        if (!msgs.length || !nspName) {
+            cb(new Error("invalid message format"), resp)
+            return
+        }
 
+        // fill _msg.getMsg() into RoomsMessage
+        let newMsgs = msgs.map((msg: api_pb.RoomMessage): proto.IRoomsMessage => {
+            // if (!_msg) return null
+            return new proto.RoomsMessage(msg.getRoomid(),
+                new proto.Message().loadFromPb(msg.getMsg()))
+        })
+
+        this._socketioSrv.broadcastRooms(nspName, newMsgs)
     }
 
-    nspUsersBroadcast = (call: grpc.ServerUnaryCall<api_pb.NspUsersBroadcastReq>, callback: grpc.requestCallback<api_pb.NspUsersBroadcastResp>) => {
+    nspUsersBroadcast = (call: grpc.ServerUnaryCall<api_pb.NspUsersBroadcastReq>, cb: grpc.requestCallback<api_pb.NspUsersBroadcastResp>) => {
+        let msgs = call.request.getMsgsList()
+        let nspName = call.request.getNspname()
+        let resp = new api_pb.NspBroadcastResp()
+        if (!msgs.length || !nspName) {
+            cb(new Error("invalid message format"), resp)
+            return
+        }
 
+        // fill _msg.getMsg() into UsersMessage
+        let newMsgs = msgs.map((msg: api_pb.UserMessage) => {
+            return new proto.UsersMessage(msg.getUserid(),
+                new proto.Message().loadFromPb(msg.getMsg()))
+        })
+
+        this._socketioSrv.broadcastUsers(nspName, newMsgs)
     }
 
-    deactive = (call: grpc.ServerUnaryCall<api_pb.DeactiveReq>, callback: grpc.requestCallback<api_pb.DeactiveResp>) => {
-
+    deactive = (call: grpc.ServerUnaryCall<api_pb.DeactiveReq>, cb: grpc.requestCallback<api_pb.DeactiveResp>) => {
+        // TODO:
+        let resp = new api_pb.NspBroadcastResp()
+        cb(null, resp)
     }
 
-    clearRoom = (call: grpc.ServerUnaryCall<api_pb.ClearRoomReq>, callback: grpc.requestCallback<api_pb.ClearRoomResp>) => {
-
+    clearRoom = (call: grpc.ServerUnaryCall<api_pb.ClearRoomReq>, cb: grpc.requestCallback<api_pb.ClearRoomResp>) => {
+        // TODO:
+        let resp = new api_pb.NspBroadcastResp()
+        cb(null, resp)
     }
 
 }
