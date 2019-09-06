@@ -4,11 +4,11 @@ import api_pb from '../../src/codegen/api/api_pb'
 import grpc from 'grpc'
 import assert from "assert"
 
-describe("servers", () => {
+describe("grpcServers", () => {
     let addr = "127.0.0.1:3001"
     let client = new grpc_pb.SocketMServiceClient(addr, grpc.credentials.createInsecure())
 
-    it('grpcServer.nsp broadcast testing', () => {
+    it('nsp broadcast testing', () => {
         let req = new api_pb.NspBroadcastReq()
         let msg = new api_pb.Message()
 

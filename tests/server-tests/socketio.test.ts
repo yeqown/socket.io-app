@@ -3,11 +3,11 @@ import assert from 'assert'
 import io from 'socket.io-client'
 import { proto } from '../../src/types'
 
-describe("servers", () => {
+describe("socketioServers", () => {
     let addr = "http://localhost:3000/demo"
     let path = "socket.io"
 
-    it("socketio.server to client", () => {
+    it("client connect", () => {
         let err: Error | null = null
         try {
             let client = io(addr, { path: path })

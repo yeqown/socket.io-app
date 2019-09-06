@@ -27,6 +27,16 @@ interface IRoomsMessage {
     msg: Required<IMessage>,
 }
 
+class RoomsMessage implements IRoomsMessage {
+    roomId: Required<string>
+    msg: Required<IMessage>
+
+    constructor(roomId: string, msg: IMessage) {
+        this.roomId = roomId
+        this.msg = msg
+    }
+}
+
 interface IUsersMessage {
     userId: Required<number>,
     msg: Required<IMessage>,
@@ -44,5 +54,5 @@ class UsersMessage implements IUsersMessage {
 
 export {
     IMessage, IRoomsMessage, IUsersMessage,
-    Message, UsersMessage
+    Message, RoomsMessage, UsersMessage
 }
