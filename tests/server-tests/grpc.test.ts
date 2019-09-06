@@ -1,14 +1,14 @@
-const describe = require('mocha').describe
-const grpc_pb = require('../../dist/codegen/api/api_grpc_pb')
-const api_pb = require('../../dist/codegen/api/api_pb')
-const grpc = require('grpc')
-const assert = require("assert")
+import { describe } from 'mocha'
+import grpc_pb from '../../src/codegen/api/api_grpc_pb'
+import api_pb from '../../src/codegen/api/api_pb'
+import grpc from 'grpc'
+import assert from "assert"
 
-describe("grpc-server", function () {
+describe("servers", () => {
     let addr = "127.0.0.1:3001"
     let client = new grpc_pb.SocketMServiceClient(addr, grpc.credentials.createInsecure())
 
-    it('nsp broadcast testing', function () {
+    it('grpcServer.nsp broadcast testing', () => {
         let req = new api_pb.NspBroadcastReq()
         let msg = new api_pb.Message()
 

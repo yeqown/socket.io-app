@@ -33,7 +33,4 @@ export const initialRedis = (c: Config) => {
     }
 }
 
-
-
-
 export { redisClientAsync }

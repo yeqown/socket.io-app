@@ -8,12 +8,12 @@ enum EventType {
 interface EvtFunc {
     (data: IOnoff): Error | null
 }
-interface OnoffEmitter {
+interface IOnoffEmitter {
     on(data: IOnoff): Error | null
     off(data: IOnoff): Error | null
 }
 
-class OnoffEmitterBasedMQ implements OnoffEmitter {
+class OnoffEmitterBasedMQ implements IOnoffEmitter {
     _mqConn: any
 
     constructor() {
@@ -31,4 +31,4 @@ class OnoffEmitterBasedMQ implements OnoffEmitter {
     }
 }
 
-export { OnoffEmitter, OnoffEmitterBasedMQ, EventType }
+export { IOnoffEmitter, OnoffEmitterBasedMQ, EventType }

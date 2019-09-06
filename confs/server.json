@@ -1,0 +1,13 @@
+{
+    "redis": {
+        "host": "127.0.0.1",
+        "port": 6379,
+        "db": 1
+    },
+    "mongo": {
+        "addr": "127.0.0.1",
+        "port": 27017,
+        "username": "",
+        "password": ""
+    }
+}

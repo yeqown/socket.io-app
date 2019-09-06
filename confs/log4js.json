@@ -13,14 +13,11 @@
                 "pattern": "[%d] [%p] [%c] ｜　%m"
             }
         },
-        "dateFile": {
-            "type": "dateFile",
-            "filename": "logs/datefile.log",
-            "pattern": "yyyy-MM-dd-hh-mm-ss",
-            "compress": true
+        "out": {
+            "type": "stdout"
         },
-        "console": {
-            "type": "console"
+        "err": {
+            "type": "stderr"
         }
     },
     "categories": {
@@ -33,10 +30,10 @@
         "default": {
             "appenders": [
                 "file",
-                "dateFile",
-                "console"
+                "out",
+                "err"
             ],
-            "level": "trace"
+            "level": "debug"
         }
     }
 }

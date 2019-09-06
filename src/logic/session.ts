@@ -1,7 +1,7 @@
 import { RedisClient } from "redis"
 import { IAuthReq, Session, IRedisClientAsync } from "../types"
 
-interface SessionManager {
+interface ISessionManager {
     set(socketId: string, authReq: IAuthReq): Error | null
 
     delBySocketId(socketId: string): Error | null
@@ -11,7 +11,7 @@ interface SessionManager {
     queryBySocketId(socketId: string): Session | Error | null
 }
 
-class SManagerBasedRedis implements SessionManager {
+class SManagerBasedRedis implements ISessionManager {
     redisAsync: IRedisClientAsync
 
     constructor(rc: IRedisClientAsync) {
@@ -39,4 +39,4 @@ class SManagerBasedRedis implements SessionManager {
     }
 }
 
-export { SessionManager, SManagerBasedRedis }
+export { ISessionManager, SManagerBasedRedis }
