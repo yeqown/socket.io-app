@@ -3,15 +3,15 @@ socket.io-based realtime app
 
 ### Features
 
-* [*] HTTP Monitor API
-* [*] gRPC Manage API
-* [*] based socket.io, it's stable
-* [*] `node.js` event driven
+* [x] HTTP Monitor API
+* [x] gRPC Manage API
+* [x] based socket.io, it's stable
+* [x] `node.js` event driven
 
 ### TODOs
 
-* [*] create examples
-* [*] import unittest frame `mocha` and write
+* [x] create examples
+* [x] import unittest frame `mocha` and write
 * [ ] fill all TODOs have been marked
 * [ ] import `redis-adapter`
 * [ ] slim client lib output, resolve lib dependecy relationship, event into one file
