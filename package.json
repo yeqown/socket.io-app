@@ -4,12 +4,11 @@
   "description": "an app based socket.io",
   "main": "./dist/main.js",
   "scripts": {
-    "test-js": "npm run compile && ./node_modules/.bin/mocha ./tests/**",
     "test-ts": "mocha -r ts-node/register tests/**/*.test.ts",
-    "compile": "rm -fr ./dist && ./node_modules/.bin/tsc",
+    "compile": "node compile.js",
     "start": "node ./dist/main.js start",
     "test": "npm run test-ts",
-    "dev": "NODE_ENV=dev npm run compile && npm run start"
+    "dev": "npm run compile && npm run start"
   },
   "repository": {
     "type": "git",
