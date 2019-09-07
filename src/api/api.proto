@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+// import "google/protobuf/any.proto";
+
+package api;
+
+service SocketMService {
+    rpc NspBroadcast (NspBroadcastReq) returns (NspBroadcastResp);
+    rpc NspRoomsBroadcast (NspRoomsBroadcastReq) returns (NspRoomsBroadcastResp);
+    rpc NspUsersBroadcast (NspUsersBroadcastReq) returns (NspUsersBroadcastResp);
+    // rpc NspRoomsBroadcast (NspRoomsBroadcastReq) returns (NspRoomsBroadcastResp);
+    rpc Deactive (DeactiveReq) returns (DeactiveResp);
+    rpc ClearRoom (ClearRoomReq) returns (ClearRoomResp);
+}
+
+message NspBroadcastReq {
+    string nspName = 1;
+    Message msg = 2;
+}
+
+message NspBroadcastResp {
+    uint32 errcode = 1;
+    string errmsg = 2;
+}
+
+message RoomMessage {
+    string roomId = 1;
+    Message msg = 2;
+}
+
+message NspRoomsBroadcastReq {
+    string nspName = 1;
+    repeated RoomMessage msgs = 2;
+}
+
+message NspRoomsBroadcastResp {
+    uint32 errcode = 1;
+    string errmsg = 2;
+}
+
+message UserMessage {
+    int64 userId = 1;
+    Message msg = 2;
+}
+
+message NspUsersBroadcastReq {
+    string nspName = 1;
+    repeated UserMessage msgs = 2;
+}
+
+message NspUsersBroadcastResp {
+    uint32 errcode = 1;
+    string errmsg = 2;
+}
+
+message DeactiveReq {
+    string token = 1;
+    int64 userId = 2; 
+}
+
+message DeactiveResp {
+    uint32 errcode = 1;
+    string errmsg = 2;
+}
+
+message ClearRoomReq {
+    repeated string roomIds = 1;
+}
+
+message ClearRoomResp {
+    uint32 errcode = 1;
+    string errmsg = 2;
+}
+
+message Message {
+    string ver = 1;
+    // Any meta = 2;
+    string meta = 2;
+    string evt = 3;
+    string id = 4;
+} 
