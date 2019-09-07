@@ -206,10 +206,11 @@ class SocketioWrapper {
                 socket.leaveAll()
                 // remove from _sockets
                 this._sockets.delete(socket.id)
-                // fill OnoffMsg with actual data
+                // call onoff emitter
                 let onoff = new OnoffMsg(_socket.getToken(), _socket.getMeta(), EventType.Off, socket.id, socket.handshake.address)
                 this._onoffEmitter.on(_nsp.name, onoff)
-                // TODO: call session manager
+                // call session manager
+                if (this._sm.delBySocketId(socket.id)) logger.error("could not delete session")
             }
         })
 
@@ -223,10 +224,12 @@ class SocketioWrapper {
                 // true: auth success
                 // save socketid to socket and req meta
                 this._sockets.set(socket.id, new SocketWrapper(socket, req))
-                // fill OnoffMsg with actual data
-                let onoff = new OnoffMsg(req.token, req.meta, EventType.On, socket.id, socket.handshake.address)
+                // call onoff emitter
+                let clientIp = socket.handshake.address
+                let onoff = new OnoffMsg(req.token, req.meta, EventType.On, socket.id, clientIp)
                 this._onoffEmitter.on(_nsp.name, onoff)
-                // TODO: call session manager
+                // call session manager
+                if (this._sm.set(socket.id, _nsp.name, clientIp, req)) logger.error("could not set session")
             } else {
                 // auth failed
                 socket.disconnect()
