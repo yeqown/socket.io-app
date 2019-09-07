@@ -4,14 +4,14 @@ import { logger } from '../utils/logger'
 
 interface IMessage {
     ver: Required<string>,
-    meta: Required<object>,
+    meta: Required<string>,
     evt: Required<string>,
     id: Required<string>,
 }
 
 class Message implements IMessage {
     ver: string
-    meta: any
+    meta: string
     evt: string
     id: string
 
@@ -19,7 +19,7 @@ class Message implements IMessage {
         this.ver = ver
         this.id = id || v4()
         this.evt = evt
-        this.meta = meta
+        this.meta = JSON.stringify(meta)
     }
 
     loadFromPb(pbm: pbMessage | undefined): IMessage {

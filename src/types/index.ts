@@ -10,6 +10,14 @@ interface Session {
     meta: object,
 }
 
+interface IJoinRoomReq {
+    roomId: string
+}
+
+interface IJoinRoomsReq {
+    rooms: IJoinRoomReq[]
+}
+
 interface IOnoff {
     token: string // AuthReq 中的 Token
     meta: object // AuthReq 中的 Meta
@@ -57,7 +65,7 @@ interface Err {
 }
 
 export {
-    Session, IOnoff, IAuthReq, AuthReq, IAuthReply, AuthReply, Err,
+    Session, IOnoff, IAuthReq, AuthReq, IAuthReply, AuthReply, Err, IJoinRoomReq, IJoinRoomsReq,
     proto,
     IRedisClientAsync,
 }

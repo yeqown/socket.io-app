@@ -4,10 +4,10 @@ import io from 'socket.io'
 import express from 'express'
 import { Request, Response } from "express";
 import http from 'http'
-import { proto, IRedisClientAsync } from 'src/types'
+import { proto, IRedisClientAsync, IJoinRoomsReq, IJoinRoomReq } from '../types'
 import { ISessionManager, SManagerBasedRedis } from '../logic'
 import { logger } from '../utils/logger'
-import { IRoomsMessage, IUsersMessage, IMessage } from 'src/types/proto'
+import { IRoomsMessage, IUsersMessage, IMessage } from '../types/proto'
 
 interface Options {
     port: Required<number>,
@@ -123,25 +123,30 @@ class SocketioWrapper {
                     socket.emit("login", {})
                 })
 
-                // TODO: fix data type
-                socket.on("join", (rooms: string[]) => {
-                    logger.info("recv join evt: ", socket.id, rooms)
-                    rooms.forEach(roomId => {
-                        logger.info("socket join room", roomId)
-                        socket.join(roomId)
+                socket.on("join", (req: IJoinRoomsReq) => {
+                    logger.info("recv join evt: ", socket.id, req)
+                    req.rooms.forEach(joinRoomReq => {
+                        logger.info("socket join room", joinRoomReq.roomId)
+                        socket.join(joinRoomReq.roomId)
                     })
                 })
 
-                socket.on("chat/users", (uMsg: IUsersMessage) => {
-                    logger.info("chat/users recv msg: ", uMsg)
-                    let _sockid = uMsg.userId.toString()
-                    let _socket = this._sockets.get(_sockid)
-                    if (_socket) _socket.emit(uMsg.msg.evt, uMsg.msg)
+                socket.on("chat/users", (uMsgs: IUsersMessage[]) => {
+                    logger.info("chat/users recv msg: ", uMsgs)
+
+                    uMsgs.forEach((msg: IUsersMessage) => {
+                        let _sockid = msg.userId.toString()
+                        let _socket = this._sockets.get(_sockid)
+                        if (_socket) _socket.emit(msg.msg.evt, msg.msg)
+                    })
                 })
 
-                socket.on("chat/broadcast_rooms", (rMsg: IRoomsMessage) => {
-                    logger.info("recv broadcast_rooms msg", rMsg)
-                    _nsp.in(rMsg.roomId).emit(rMsg.msg.evt, rMsg.msg)
+                socket.on("chat/rooms", (rMsgs: IRoomsMessage[]) => {
+                    logger.info("recv broadcast_rooms msg", rMsgs)
+
+                    rMsgs.forEach((msg: IRoomsMessage) => {
+                        _nsp.in(msg.roomId).emit(msg.msg.evt, msg.msg)
+                    })
                 })
 
                 // listening custom evt and mount
