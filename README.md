@@ -1,10 +1,24 @@
 # socket.io-app
 socket.io-based realtime app
 
+### Features
+
+* [*] HTTP Monitor API
+* [*] gRPC Manage API
+* [*] based socket.io, it's stable
+* [*] `node.js` event driven
+
+### TODOs
+
+* [*] create examples
+* [*] import unittest frame `mocha` and write
+* [ ] fill all TODOs have been marked
+* [ ] import `redis-adapter`
+
 ### Dependencies
 
 * `redis` for session and token manage
-* `nsq` or other MQ
+* `nsq` or other MQ, not yet
 
 
 ### Basic Evts - 双工事件约定
@@ -17,6 +31,7 @@ socket.io-based realtime app
     6. join/reply 服务端针对客户端加入房间回送消息
     7. auth 客户端鉴权事件
     8. auth/reply 服务端鉴权回送消息
+    9. error 所有业务中的错误信息返回事件
 
 ### RPC APIs
 

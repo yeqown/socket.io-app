@@ -79,5 +79,5 @@ main()
 
 // recovery for nodejs
 process.on("uncaughtException", (err) => {
-    logger.error(err);
+    logger.error("process error: ", err);
 })

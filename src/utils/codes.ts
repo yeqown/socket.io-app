@@ -3,13 +3,20 @@ export enum codes {
     Undefined = -1,
     OK = 0,
     ServerErr,
+    ParamInvalid,
+    TokenInvalid,
+    AuthTimeout,
 }
 
 const _messages = new Map<number, string>();
 (function (m: Map<number, string>) {
+    m.set(codes.Undefined, "undefined code")
     m.set(codes.OK, "ok")
     m.set(codes.ServerErr, "server err")
-    m.set(codes.Undefined, "undefined code")
+    m.set(codes.ParamInvalid, "param invalid")
+    m.set(codes.TokenInvalid, "token invalid")
+    m.set(codes.AuthTimeout, "auth timeout")
+
 }(_messages))
 
 export const getMessage = (code: number): string => {

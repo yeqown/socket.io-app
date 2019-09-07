@@ -1,9 +1,10 @@
-import { IAuthReq, IAuthReply, IJoinRoomsReq, proto } from '../src/types'
+import { IAuthReq, IAuthReply, IJoinRoomsReq, proto, AuthReq } from '../src/types'
+import { ITokenr, DesTokenr } from '../src/logic'
 // import SocketIOClient from 'socket.io-client'
 import io from 'socket.io-client'
 
 export interface IAuthCallback {
-    (err: Error, reply: IAuthReply): void
+    (reply: IAuthReply): void
 }
 
 export interface CommonCallback {
@@ -11,7 +12,7 @@ export interface CommonCallback {
 }
 
 export interface IClient {
-    auth(req: IAuthReq, cb: IAuthCallback): void
+    auth(userId: number, meta: any, cb: IAuthCallback): void
     join(req: IJoinRoomsReq, cb: CommonCallback): void
 }
 
@@ -26,17 +27,24 @@ export interface EvtCallback {
 
 export class Client implements IClient {
     _socket: SocketIOClient.Socket
+    _des: ITokenr
 
     constructor(addr: string, opt: Options, cbs: EvtCallback[]) {
+        this._des = new DesTokenr()
         // console.log(addr, opt, cbs);
         this._socket = io(addr, opt)
+        this._socket.on("logic/error", (err: any) => {
+            console.log("recv an error: ", err)
+        })
 
         cbs.forEach((evtCb) => {
             this._socket.on(evtCb.evt, evtCb.cb)
         })
     }
 
-    auth(req: IAuthReq, cb: IAuthCallback): void {
+    auth(userId: number, meta: any, cb: IAuthCallback): void {
+        let req = this._des.gen(userId, meta)
+        // let req: IAuthReq = new AuthReq(userId, tok, meta)
         this._socket.emit("auth", req)
         this._socket.once("auth/reply", cb)
     }

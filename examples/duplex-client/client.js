@@ -41,7 +41,7 @@ const main = () => {
 
     rl.question("what's your userId ?\n", function (answer) {
         userId = answer
-        client.auth({ userId }, function (data) {
+        client.auth(userId, { meta: "foobar" }, function (data) {
             console.log("auth evt: ", data);
         })
 

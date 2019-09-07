@@ -1,8 +1,8 @@
-import * as des from './des'
 import { codes, getMessage } from './codes'
 // import { logger, configureLogger } from './logger'
 // import { Logger } from 'log4js'
 import { Config } from './confs'
+import { Des, DesAlgorithm } from './des'
 /**
  * getNowTimestamp get timestamp (ms)
  */
@@ -15,9 +15,9 @@ const getNowTimestamp = (): number => {
 // }
 
 export {
-    des,
+    Des, DesAlgorithm,
     codes, getMessage,
     // configureLogger, logger,
     Config,
-    getNowTimestamp
+    getNowTimestamp,
 }
