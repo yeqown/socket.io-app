@@ -12,6 +12,9 @@ socket.io-based realtime app
 
 * [x] create examples
 * [x] import unittest frame `mocha` and write
+* [x] plugin session manager
+* [ ] fill gRPC server functions
+* [ ] fill http monitor handlers
 * [ ] fill all TODOs have been marked
 * [ ] import `redis-adapter`
 * [ ] slim client lib output, resolve lib dependecy relationship, event into one file
@@ -32,7 +35,7 @@ socket.io-based realtime app
     6. join/reply 服务端针对客户端加入房间回送消息
     7. auth 客户端鉴权事件
     8. auth/reply 服务端鉴权回送消息
-    9. error 所有业务中的错误信息返回事件
+    9. logic/error 所有业务中的错误信息返回事件
 
 ### RPC APIs
 
