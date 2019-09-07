@@ -1,5 +1,5 @@
 import * as proto from './proto'
-import { IRedisClientAsync } from './redis-async'
+// import { IRedisClientAsync } from './redis-async'
 
 interface Session {
     userId: number,
@@ -65,7 +65,8 @@ interface Err {
 }
 
 export {
-    Session, IOnoff, IAuthReq, AuthReq, IAuthReply, AuthReply, Err, IJoinRoomReq, IJoinRoomsReq,
+    IOnoff, IAuthReq, IAuthReply, AuthReply, IJoinRoomReq, IJoinRoomsReq,
+    Session, AuthReq, Err,
+    // IRedisClientAsync,
     proto,
-    IRedisClientAsync,
 }

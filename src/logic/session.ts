@@ -1,5 +1,5 @@
 import { RedisClient } from "redis"
-import { IAuthReq, Session, IRedisClientAsync } from "../types"
+import { IAuthReq, Session } from "../types"
 
 interface ISessionManager {
     set(socketId: string, authReq: IAuthReq): Error | null
@@ -12,10 +12,10 @@ interface ISessionManager {
 }
 
 class SManagerBasedRedis implements ISessionManager {
-    redisAsync: IRedisClientAsync
+    rc: RedisClient
 
-    constructor(rc: IRedisClientAsync) {
-        this.redisAsync = rc
+    constructor(rc: RedisClient) {
+        this.rc = rc
     }
 
     set(socketId: string, authReq: IAuthReq): Error | null {

@@ -6,9 +6,9 @@
 // import bluebird from 'bluebird'
 // import * as redis from 'redis'
 import { RedisClient, createClient, ClientOpts } from 'redis'
-import { Config } from '../utils/confs'
-import { promisify } from 'util'
-import { IRedisClientAsync } from '../types'
+import { logger } from '../utils/logger'
+// import { Config } from '../utils/confs'
+// import { promisify } from 'util'
 
 // add promise to all redis-client functions
 // bluebird.promisifyAll(RedisClient);
@@ -16,21 +16,25 @@ import { IRedisClientAsync } from '../types'
 // let redisClient: RedisClient
 // let mqClient: NSQClient
 
-let redisClientAsync: IRedisClientAsync
+let redisClient: RedisClient
 
-export const initialRedis = (c: Config) => {
+export const initialRedis = (opt: ClientOpts) => {
     // let redisClientOpts: ClientOpts = {
     //     port: opt.port,
     //     host: opt.host,
     // }
-    let redisClient = createClient(c.redisOpts)
-
-    const getAsync = promisify(redisClient.get).bind(redisClient)
-
-    redisClientAsync = {
-        client: redisClient,
-        getAsync: getAsync,
+    try {
+        redisClient = createClient(opt)
+    } catch (err) {
+        logger.error("could not create redis client", err)
     }
+
+    // const getAsync = promisify(redisClient.get).bind(redisClient)
+
+    // redisClientAsync = {
+    //     client: redisClient,
+    //     getAsync: getAsync,
+    // }
 }
 
-export { redisClientAsync }
+export { redisClient }

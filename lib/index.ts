@@ -28,7 +28,7 @@ export class Client implements IClient {
     _socket: SocketIOClient.Socket
 
     constructor(addr: string, opt: Options, cbs: EvtCallback[]) {
-        console.log(addr, opt, cbs);
+        // console.log(addr, opt, cbs);
         this._socket = io(addr, opt)
 
         cbs.forEach((evtCb) => {
@@ -51,13 +51,22 @@ export class Client implements IClient {
         let msg: proto.IMessage = new proto.Message(meta)
         msg.evt = 'chat/rooms'
         let roomsMsg: proto.IRoomsMessage = new proto.RoomsMessage(roomId, msg)
-        this._socket.emit("chat/rooms", [roomsMsg])
+        try {
+            this._socket.emit("chat/rooms", [roomsMsg])
+        } catch (err) {
+            throw err
+        }
     }
 
     sendToUser(userId: number, meta: any): void {
         let msg: proto.IMessage = new proto.Message(meta)
         msg.evt = "chat/users"
         let usersMsg: proto.IUsersMessage = new proto.UsersMessage(userId, msg)
-        this._socket.emit("chat/users", [usersMsg])
+
+        try {
+            this._socket.emit("chat/users", [usersMsg])
+        } catch (err) {
+            throw err
+        }
     }
 }

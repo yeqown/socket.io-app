@@ -9,5 +9,12 @@
         "port": 27017,
         "username": "",
         "password": ""
+    },
+    "socketio": {
+        "port": 3000,
+        "path": "/socket.io"
+    },
+    "grpc": {
+        "port": 3001
     }
 }

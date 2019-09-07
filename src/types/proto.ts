@@ -11,7 +11,7 @@ interface IMessage {
 
 class Message implements IMessage {
     ver: string
-    meta: string
+    meta: any
     evt: string
     id: string
 
@@ -19,7 +19,7 @@ class Message implements IMessage {
         this.ver = ver
         this.id = id || v4()
         this.evt = evt
-        this.meta = JSON.stringify(meta)
+        this.meta = meta
     }
 
     loadFromPb(pbm: pbMessage | undefined): IMessage {
@@ -27,7 +27,7 @@ class Message implements IMessage {
             logger.error("meet an undefined api_pb.Message")
             return this
         }
-        this.meta = pbm.getMeta()
+        this.meta = JSON.parse(pbm.getMeta())
         this.ver = pbm.getVer()
         this.evt = pbm.getEvt()
         this.id = pbm.getId() || v4()

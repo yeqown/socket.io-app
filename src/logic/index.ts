@@ -1,8 +1,8 @@
 import { ISessionManager, SManagerBasedRedis } from "./session"
-import { IOnoffEmitter, OnoffEmitterBasedMQ } from './onoff'
+import { IOnoffEmitter, OnoffEmitterBasedMQ, OnoffMsg, OnoffEmitterBasedRedis, EventType } from './onoff'
 
 
 export {
-    ISessionManager, SManagerBasedRedis,
-    IOnoffEmitter, OnoffEmitterBasedMQ
+    ISessionManager, IOnoffEmitter,
+    SManagerBasedRedis, OnoffEmitterBasedRedis, OnoffEmitterBasedMQ, OnoffMsg, EventType
 }

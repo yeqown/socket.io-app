@@ -1,9 +1,9 @@
-import { RedisClient } from "redis";
+// import { RedisClient } from "redis";
 
-interface IRedisClientAsync {
-    client: RedisClient
-    getAsync(key: string): Promise<string>
-}
+// interface IRedisClientAsync {
+//     client: RedisClient
+//     getAsync(key: string): Promise<string>
+// }
 
 
-export { IRedisClientAsync }
+// export { IRedisClientAsync }

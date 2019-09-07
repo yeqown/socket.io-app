@@ -2,11 +2,15 @@ import path from 'path'
 import yargs, { Argv } from 'yargs'
 
 import { initialSocketio, initialRPC } from './server'
+// TODO: adjust import and export
 import { Options, SocketioWrapper } from './server/socketio'
 import { Options as gOptions, gRPCService } from './server/grpc'
 import { configureLogger, logger } from './utils/logger'
-import { initialRedis, redisClientAsync } from './global'
-import { Config } from './utils/confs'
+import { Config } from './utils'
+import { initialRedis } from './global'
+import { redisClient } from './global/ins'
+// import { promisify } from 'util'
+// import { Logger } from 'log4js'
 
 
 function main() {
@@ -43,27 +47,31 @@ function main() {
     argv
 }
 
+
 const run = (log4jsConf: string, conf: Required<string>) => {
     // Step: config logger
     configureLogger(path.join(__dirname, log4jsConf))
+    // const configureLoggerAsync = promisify<string, Logger | null>(configureLogger)
+    // configureLoggerAsync(path.join(__dirname, log4jsConf)).then(l => {
+    // })
 
     // Step: load config
     let cfg: Config = new Config(path.join(__dirname, conf))
 
     // Step: load redis
-    initialRedis(cfg)
+    initialRedis(cfg.redisOpts)
 
     // TODO: Step: load mongo
-    // initialMongo(cfg)
+    // initialMongo(cfg.MongoOpts)
 
     // Step: socketio server
-    let opt: Options = { port: 3000, path: "/socket.io" }
-    let s: SocketioWrapper = initialSocketio(opt, redisClientAsync)
+    // let opt: Options = cfg.
+    let s: SocketioWrapper = initialSocketio(cfg.socketioOpts, redisClient)
     s.serve()
 
     // Step: gRPC server
-    let opt2: gOptions = { port: 3001 }
-    let s2: gRPCService = initialRPC(opt2, s)
+    // let opt2: gOptions = { port: 3001 }
+    let s2: gRPCService = initialRPC(cfg.grpcOpts, s)
     s2.serve()
 }
 

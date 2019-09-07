@@ -4,10 +4,15 @@ import io from 'socket.io'
 import express from 'express'
 import { Request, Response } from "express";
 import http from 'http'
-import { proto, IRedisClientAsync, IJoinRoomsReq, IJoinRoomReq } from '../types'
-import { ISessionManager, SManagerBasedRedis } from '../logic'
+import { proto, IJoinRoomsReq, IJoinRoomReq, AuthReply } from '../types'
+import {
+    ISessionManager, IOnoffEmitter,
+    SManagerBasedRedis, OnoffEmitterBasedRedis, OnoffMsg, EventType
+} from '../logic'
+
+import { codes, getMessage } from '../utils'
 import { logger } from '../utils/logger'
-import { IRoomsMessage, IUsersMessage, IMessage } from '../types/proto'
+import { RedisClient } from 'redis';
 
 interface Options {
     port: Required<number>,
@@ -31,6 +36,7 @@ class SocketioWrapper {
     _sm: ISessionManager
 
     _nspConfiger: INspConfiger
+    _onoffEmitter: IOnoffEmitter
 
     _io: io.Server
     _httpSrv: http.Server
@@ -39,11 +45,14 @@ class SocketioWrapper {
     _nsps: Map<string, io.Namespace>
     _sockets: Map<string, io.Socket>
 
-    constructor(opt: Options, rc: IRedisClientAsync) {
+    constructor(opt: Options, rc: RedisClient) {
         logger.info("socketio-wrapper initializing with opts: ", opt);
         this.port = opt.port || 3000
+
         this._sm = new SManagerBasedRedis(rc)
         this._nspConfiger = new NspConfiger()
+        this._onoffEmitter = new OnoffEmitterBasedRedis(rc)
+
         this._nsps = new Map<string, io.Namespace>()
         this._sockets = new Map<string, io.Socket>()
 
@@ -82,7 +91,7 @@ class SocketioWrapper {
 
     /**
      * rmeove an Nsp [Nsp event & Nsp]
-     * TODO:
+     * @param nspName
      */
     removeNsp = (nspName: string): Error | null => {
         let _nsp = this._nsps.get(nspName)
@@ -98,7 +107,7 @@ class SocketioWrapper {
     private _mountNsps = () => {
         let nspCfgs = this._nspConfiger.allNsp()
 
-        nspCfgs.forEach(cfg => {
+        nspCfgs.forEach((cfg: NpsConfig) => {
             if (this._nsps.get(cfg.name)) {
                 logger.error("duplicate nsp name config: ", cfg.name)
                 return
@@ -109,57 +118,75 @@ class SocketioWrapper {
             let _nsp = this._io.of(cfg.name)
 
             _nsp.on("connection", (socket: io.Socket) => {
-                logger.info("connected socketId: ", socket.id)
-                this._sockets.set(socket.id, socket)
-
-                socket.on("disconnect", (d) => {
-                    logger.info("disconnect socketId: ", socket.id, "args:", d)
-                    socket.leaveAll()
-                    this._sockets.delete(socket.id)
-                })
-
-                socket.on("auth", (d) => {
-                    logger.info("auth socketId: ", socket.id, "args:", d)
-                    socket.emit("login", {})
-                })
-
-                socket.on("join", (req: IJoinRoomsReq) => {
-                    logger.info("recv join evt: ", socket.id, req)
-                    req.rooms.forEach(joinRoomReq => {
-                        logger.info("socket join room", joinRoomReq.roomId)
-                        socket.join(joinRoomReq.roomId)
-                    })
-                })
-
-                socket.on("chat/users", (uMsgs: IUsersMessage[]) => {
-                    logger.info("chat/users recv msg: ", uMsgs)
-
-                    uMsgs.forEach((msg: IUsersMessage) => {
-                        let _sockid = msg.userId.toString()
-                        let _socket = this._sockets.get(_sockid)
-                        if (_socket) _socket.emit(msg.msg.evt, msg.msg)
-                    })
-                })
-
-                socket.on("chat/rooms", (rMsgs: IRoomsMessage[]) => {
-                    logger.info("recv broadcast_rooms msg", rMsgs)
-
-                    rMsgs.forEach((msg: IRoomsMessage) => {
-                        _nsp.in(msg.roomId).emit(msg.msg.evt, msg.msg)
-                    })
-                })
-
-                // listening custom evt and mount
-                cfg.listenEvts.forEach(evt => {
-                    socket.on(evt, (data: any) => {
-                        // TODO: not authed client should not be allowed to send any msg
-                        logger.info("evt: ", evt, "data: ", data)
-                    })
-                })
+                this._hdlSocket(_nsp, socket, cfg)
             })
 
             // record nsp
             this._nsps.set(cfg.name, _nsp)
+        })
+    }
+
+    /**
+     * hdl socket with it's evt
+     * @param _nsp
+     * @param socket
+     */
+    private _hdlSocket = (_nsp: io.Namespace, socket: io.Socket, cfg: NpsConfig) => {
+        logger.info("connected socketId: ", socket.id)
+        this._sockets.set(socket.id, socket)
+
+        socket.on("disconnect", (d) => {
+            logger.info("disconnect socketId: ", socket.id, "args:", d)
+
+            socket.leaveAll()
+            this._sockets.delete(socket.id)
+
+            // TODO: fill OnoffMsg with actual data
+            let onoff = new OnoffMsg('', {}, EventType.Off, socket.id, socket.handshake.address)
+            this._onoffEmitter.on(_nsp.name, onoff)
+        })
+
+        socket.on("auth", (d) => {
+            // TODO: call Auth Logic
+
+            // TODO: fill OnoffMsg with actual data
+            let onoff = new OnoffMsg('', {}, EventType.On, socket.id, socket.handshake.address)
+            this._onoffEmitter.on(_nsp.name, onoff)
+            logger.info("auth socketId: ", socket.id, "args:", d)
+            socket.emit("auth/reply", new AuthReply(codes.OK, getMessage(codes.OK)))
+        })
+
+        socket.on("join", (req: IJoinRoomsReq) => {
+            logger.info("recv join evt: ", socket.id, req)
+            req.rooms.forEach(joinRoomReq => {
+                logger.info("socket join room", joinRoomReq.roomId)
+                socket.join(joinRoomReq.roomId)
+            })
+        })
+
+        socket.on("chat/users", (uMsgs: proto.IUsersMessage[]) => {
+            logger.info("chat/users recv msg: ", uMsgs)
+            uMsgs.forEach((msg: proto.IUsersMessage) => {
+                let _sockid = msg.userId.toString()
+                let _socket = this._sockets.get(_sockid)
+                if (_socket) _socket.emit(msg.msg.evt, msg.msg)
+            })
+        })
+
+        socket.on("chat/rooms", (rMsgs: proto.IRoomsMessage[]) => {
+            logger.info("recv broadcast_rooms msg", rMsgs)
+
+            rMsgs.forEach((msg: proto.IRoomsMessage) => {
+                _nsp.in(msg.roomId).emit(msg.msg.evt, msg.msg)
+            })
+        })
+
+        // listening custom evt and mount
+        cfg.listenEvts.forEach(evt => {
+            socket.on(evt, (data: any) => {
+                // TODO: not authed client should not be allowed to send any msg
+                logger.info("evt: ", evt, "data: ", data)
+            })
         })
     }
 
@@ -195,7 +222,7 @@ class SocketioWrapper {
             return
         }
 
-        msgs.forEach((rMsg: IRoomsMessage) => {
+        msgs.forEach((rMsg: proto.IRoomsMessage) => {
             _nsp.in(rMsg.roomId).emit(rMsg.msg.evt, rMsg.msg)
         })
     }
@@ -206,7 +233,7 @@ class SocketioWrapper {
             logger.error("could not get nsp by name: ", nspName)
             return
         }
-        msgs.forEach((uMsg: IUsersMessage) => {
+        msgs.forEach((uMsg: proto.IUsersMessage) => {
             _nsp.in(uMsg.userId.toString()).emit(uMsg.msg.evt, uMsg.msg)
         });
     }

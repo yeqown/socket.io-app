@@ -1,9 +1,9 @@
 import { gRPCService, Options as gOptions } from './grpc'
 import { SocketioWrapper, Options } from './socketio'
-import { IRedisClientAsync } from 'src/types'
+// import { IRedisClientAsync } from 'src/types'
+import { RedisClient } from 'redis'
 
-function initialSocketio(opt: Options, rc: IRedisClientAsync): SocketioWrapper {
-    // TODO: pass value into Socketio.Wrapper
+function initialSocketio(opt: Options, rc: RedisClient): SocketioWrapper {
     // let opt: Options = { port: 3000 }
     let s = new SocketioWrapper(opt, rc)
     // open server
