@@ -14,6 +14,7 @@ socket.io-based realtime app
 * [*] import unittest frame `mocha` and write
 * [ ] fill all TODOs have been marked
 * [ ] import `redis-adapter`
+* [ ] slim client lib output, resolve lib dependecy relationship, event into one file
 
 ### Dependencies
 

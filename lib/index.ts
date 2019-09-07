@@ -1,5 +1,6 @@
-import { IAuthReq, IAuthReply, IJoinRoomsReq, proto, AuthReq } from '../src/types'
-import { ITokenr, DesTokenr } from '../src/logic'
+import { IAuthReply, IJoinRoomsReq } from '../src/types/types'
+import * as proto from '../src/types/proto'
+import { ITokenr, DesTokenr } from '../src/logic/auth'
 // import SocketIOClient from 'socket.io-client'
 import io from 'socket.io-client'
 

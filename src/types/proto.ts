@@ -1,6 +1,6 @@
 import { v4 } from 'uuid'
 import { Message as pbMessage } from '../codegen/api/api_pb'
-import { logger } from '../utils/logger'
+// import { logger } from '../utils/logger'
 
 interface IMessage {
     ver: Required<string>,
@@ -24,7 +24,7 @@ class Message implements IMessage {
 
     loadFromPb(pbm: pbMessage | undefined): IMessage {
         if (pbm === undefined) {
-            logger.error("meet an undefined api_pb.Message")
+            console.log("meet an undefined api_pb.Message")
             return this
         }
         this.meta = JSON.parse(pbm.getMeta())

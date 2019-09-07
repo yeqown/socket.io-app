@@ -4,18 +4,15 @@ import api_pb from "../codegen/api/api_pb";
 import { logger } from '../utils/logger'
 import { codes, getMessage } from '../utils/codes'
 import { SocketioWrapper } from "./socketio";
-import { proto } from "../types";
+import { proto, GrpcServerOptions } from "../types";
 
-interface Options {
-    port: number
-}
 
 class gRPCService {
     port: number
     _socketioSrv: SocketioWrapper
     // _srv: grpc.Server
 
-    constructor(opt: Options, socketioSrv: SocketioWrapper) {
+    constructor(opt: GrpcServerOptions, socketioSrv: SocketioWrapper) {
         logger.info("init gRPCService with opt: ", opt);
         this.port = opt.port
         this._socketioSrv = socketioSrv
@@ -102,4 +99,4 @@ class gRPCService {
 
 }
 
-export { gRPCService, Options }
+export { gRPCService }

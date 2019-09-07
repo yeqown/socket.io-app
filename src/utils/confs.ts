@@ -1,14 +1,13 @@
 import { ClientOpts } from 'redis'
 import { readFileSync } from 'fs'
 import { logger } from './logger'
-import { Options as ioOpts } from '../server/socketio'
-import { Options as grpcOpts } from '../server/grpc'
+import { SocketioOptions, GrpcServerOptions } from '../types'
 
 class Config {
     redisOpts: ClientOpts
     mgoOpts: any
-    socketioOpts: ioOpts
-    grpcOpts: grpcOpts
+    socketioOpts: SocketioOptions
+    grpcOpts: GrpcServerOptions
 
     constructor(confPath: string) {
         let buf: Buffer

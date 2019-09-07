@@ -1,16 +1,16 @@
 import path from 'path'
 import yargs, { Argv } from 'yargs'
 
-import { initialSocketio, initialRPC } from './server'
-// TODO: adjust import and export
-import { Options, SocketioWrapper } from './server/socketio'
-import { Options as gOptions, gRPCService } from './server/grpc'
+import { initialSocketio, initialRPC, gRPCService, SocketioWrapper } from './server'
+// import { } from './server/socketio'
+// import { } from './server/grpc'
 import { configureLogger, logger } from './utils/logger'
 import { Config } from './utils'
 import { initialRedis } from './global'
 import { redisClient } from './global/ins'
 // import { promisify } from 'util'
 // import { Logger } from 'log4js'
+// import { GrpcServerOptions, SocketioOptions } from './types'
 
 
 function main() {

@@ -4,7 +4,7 @@ import io from 'socket.io'
 import express from 'express'
 import { Request, Response } from "express";
 import http from 'http'
-import { proto, IJoinRoomsReq, IJoinRoomReq, AuthReply, AuthReq, IAuthReq } from '../types'
+import { proto, IJoinRoomsReq, AuthReq, IAuthReq, SocketioOptions } from '../types'
 import {
     ISessionManager, IOnoffEmitter,
     SManagerBasedRedis, OnoffEmitterBasedRedis, OnoffMsg, EventType, ITokenr, DesTokenr
@@ -16,11 +16,6 @@ import { RedisClient } from 'redis';
 
 const _logicErrorEvt = "logic/error"
 
-interface Options {
-    port: Required<number>,
-    path: Required<string>,
-    transport?: string[],
-}
 
 class SocketWrapper {
     private _socket: io.Socket
@@ -76,7 +71,7 @@ class SocketioWrapper {
     // and not trigger online or offline evt
     _sockets: Map<string, SocketWrapper>
 
-    constructor(opt: Options, rc: RedisClient) {
+    constructor(opt: SocketioOptions, rc: RedisClient) {
         logger.info("socketio-wrapper initializing with opts: ", opt);
         this.port = opt.port || 3000
 
@@ -391,4 +386,4 @@ class NspConfiger implements INspConfiger {
     }
 }
 
-export { SocketioWrapper, Options }
+export { SocketioWrapper }
