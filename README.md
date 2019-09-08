@@ -22,6 +22,7 @@ socket.io-based realtime app
 ### Dependencies
 
 * `redis` for session and token manage
+* `mongodb` from namespace configs ...
 * `nsq` or other MQ, not yet
 
 

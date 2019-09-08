@@ -41,7 +41,7 @@ class SManagerBasedRedis implements ISessionManager {
 
         multi.set(SManagerBasedRedis._genSocketIdKey(socketId), v)
         multi.set(SManagerBasedRedis._genUserIdKey(req.userId, nspName), v)
-        multi.exec_atomic((err, reply) => {
+        multi.exec_atomic((err: Error | null, reply: any) => {
             if (err) { logger.error("could not set session"); return err }
             if (reply) logger.info(`set session=${session} with reply: ${reply}`)
         })
@@ -71,24 +71,22 @@ class SManagerBasedRedis implements ISessionManager {
      * @param socketId 
      */
     public delBySocketId(socketId: string): Error | null {
-        this.queryBySocketId(socketId).then(v => {
-            if (v instanceof Session) {
-                let multi = this.rc.multi()
-                multi.del(SManagerBasedRedis._genSocketIdKey(socketId))
-                multi.del(SManagerBasedRedis._genUserIdKey(v.userId, v.nsp))
-                multi.exec_atomic((err, reply) => {
-                    if (err) { logger.error(`could not del session by socketId=${socketId}`); return err }
-                    if (reply) logger.info(`del session by socketId=${socketId} with reply: ${reply}`)
-                })
-            } else {
+        this.queryBySocketId(socketId).then((v: ISession | Error) => {
+            if (v instanceof Error) {
                 // true err
+                logger.error("could not get session by socketId: ", socketId)
                 return v
             }
-
-        }).catch(err => {
-            logger.error("could not get session by socketId: ", socketId)
-            return err
+            let multi = this.rc.multi()
+            multi.del(SManagerBasedRedis._genSocketIdKey(socketId))
+            multi.del(SManagerBasedRedis._genUserIdKey(v.userId, v.nsp))
+            multi.exec_atomic((err: Error | null, reply: any) => {
+                if (err) { logger.error(`could not del session by socketId=${socketId}`); return err }
+                if (reply) logger.info(`del session by socketId=${socketId} with reply: ${reply}`)
+            })
+            return null
         })
+
         return null
     }
 
@@ -98,8 +96,14 @@ class SManagerBasedRedis implements ISessionManager {
      * @param nspName 
      */
     public delByUserId(userId: number, nspName: string): Error | null {
-        this.queryByUserId(userId, nspName).then(v => {
-            if (v instanceof Session) {
+        this.queryByUserId(userId, nspName)
+            .then((v: ISession | Error) => {
+                if (v instanceof Error) {
+                    // true err
+                    logger.error("could not get session by userId: ", userId)
+                    return
+                }
+
                 let multi = this.rc.multi()
                 multi.del(SManagerBasedRedis._genSocketIdKey(v.socketId))
                 multi.del(SManagerBasedRedis._genUserIdKey(userId, nspName))
@@ -107,23 +111,17 @@ class SManagerBasedRedis implements ISessionManager {
                     if (err) { logger.error(`could not del session by userId=${userId} nsp=${nspName}`); return err }
                     if (reply) logger.info(`del session by userId=${userId} nsp=${nspName} with reply: ${reply}`)
                 })
-            } else {
-                // true err
-                return v
-            }
+            })
 
-        }).catch(err => {
-            logger.error("could not get session by userId: ", userId)
-            return err
-        })
         return null
+        // return v
     }
 
     queryByUserId(userId: number, nspName: string): Promise<ISession | Error> {
         let key = SManagerBasedRedis._genUserIdKey(userId, nspName)
         let getAsync = promisify(this.rc.get).bind(this.rc)
 
-        let v = getAsync(key).then(v => {
+        let v = getAsync(key).then((v: string) => {
             return new Session().unmarshal(v)
         }).catch((err: Error) => {
             console.log(err)
@@ -139,7 +137,7 @@ class SManagerBasedRedis implements ISessionManager {
         let key = SManagerBasedRedis._genSocketIdKey(socketId)
         let getAsync = promisify(this.rc.get).bind(this.rc)
 
-        let v = getAsync(key).then(v => {
+        let v = getAsync(key).then((v: string) => {
             return new Session().unmarshal(v)
         }).catch((err: Error) => {
             console.log(err)
