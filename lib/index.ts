@@ -3,6 +3,7 @@ import * as proto from '../src/types/proto'
 import { ITokenr, DesTokenr } from '../src/logic/auth'
 // import SocketIOClient from 'socket.io-client'
 import io from 'socket.io-client'
+import { addSlashLeft } from '../src/utils'
 
 export interface IAuthCallback {
     (reply: IAuthReply): void
@@ -13,11 +14,13 @@ export interface CommonCallback {
 }
 
 export interface IClient {
-    auth(userId: number, meta: any, cb: IAuthCallback): void
+    auth(userId: Required<number>, meta: any, cb: IAuthCallback): void
     join(req: IJoinRoomsReq, cb: CommonCallback): void
 }
 
 export interface Options {
+    host: Required<string>
+    nspName: Required<string>
     path: string
 }
 
@@ -29,13 +32,16 @@ export interface EvtCallback {
 export class Client implements IClient {
     _socket: SocketIOClient.Socket
     _des: ITokenr
+    _opt: Options
 
-    constructor(addr: string, opt: Options, cbs: EvtCallback[]) {
+    constructor(opt: Options, cbs: EvtCallback[]) {
         this._des = new DesTokenr()
+        this._opt = opt
         // console.log(addr, opt, cbs);
+        let addr = opt.host + addSlashLeft(opt.nspName)
         this._socket = io(addr, opt)
-        this._socket.on("logic/error", (err: any) => {
-            console.log("recv an error: ", err)
+        this._socket.on("logic/error", (...args: any[]) => {
+            console.log("recv an error: ", args)
         })
 
         cbs.forEach((evtCb) => {
@@ -59,7 +65,7 @@ export class Client implements IClient {
         // let meta = { content: }
         let msg: proto.IMessage = new proto.Message(meta)
         msg.evt = 'chat/rooms'
-        let roomsMsg: proto.IRoomsMessage = new proto.RoomsMessage(roomId, msg)
+        let roomsMsg: proto.IRoomsMessage = new proto.RoomsMessage(this._opt.nspName, roomId, msg)
         try {
             this._socket.emit("chat/rooms", [roomsMsg])
         } catch (err) {
@@ -70,7 +76,7 @@ export class Client implements IClient {
     sendToUser(userId: number, meta: any): void {
         let msg: proto.IMessage = new proto.Message(meta)
         msg.evt = "chat/users"
-        let usersMsg: proto.IUsersMessage = new proto.UsersMessage(userId, msg)
+        let usersMsg: proto.IUsersMessage = new proto.UsersMessage(this._opt.nspName, userId, msg)
 
         try {
             this._socket.emit("chat/users", [usersMsg])

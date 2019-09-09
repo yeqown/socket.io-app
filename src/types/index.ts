@@ -1,16 +1,14 @@
 import * as proto from './proto'
+export { proto }
 import {
-    IOnoff, IAuthReq, IAuthReply, AuthReply, IJoinRoomReq, IJoinRoomsReq,
+    IOnoff, IAuthReq, IAuthReply, AuthReply, IJoinRoomReq, IJoinRoomsReq, ISession,
     Session, AuthReq, Err
 } from './types'
-// import { IRedisClientAsync } from './redis-async'
-
-import { GrpcServerOptions, SocketioOptions } from './opts'
-
 export {
-    IOnoff, IAuthReq, IAuthReply, AuthReply, IJoinRoomReq, IJoinRoomsReq,
+    IOnoff, IAuthReq, IAuthReply, AuthReply, IJoinRoomReq, IJoinRoomsReq, ISession,
     Session, AuthReq, Err,
-    // IRedisClientAsync,
-    proto,
-    GrpcServerOptions, SocketioOptions,
 }
+import { GrpcServerOptions, SocketioOptions } from './opts'
+export { GrpcServerOptions, SocketioOptions, }
+import { codes, getMessage } from './codes'
+export { codes, getMessage }

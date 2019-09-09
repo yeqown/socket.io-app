@@ -218,32 +218,32 @@ export namespace NspUsersBroadcastResp {
     }
 }
 
-export class DeactiveReq extends jspb.Message { 
-    getToken(): string;
-    setToken(value: string): void;
+export class DisconnectReq extends jspb.Message { 
+    getNspname(): string;
+    setNspname(value: string): void;
 
     getUserid(): number;
     setUserid(value: number): void;
 
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): DeactiveReq.AsObject;
-    static toObject(includeInstance: boolean, msg: DeactiveReq): DeactiveReq.AsObject;
+    toObject(includeInstance?: boolean): DisconnectReq.AsObject;
+    static toObject(includeInstance: boolean, msg: DisconnectReq): DisconnectReq.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: DeactiveReq, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): DeactiveReq;
-    static deserializeBinaryFromReader(message: DeactiveReq, reader: jspb.BinaryReader): DeactiveReq;
+    static serializeBinaryToWriter(message: DisconnectReq, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): DisconnectReq;
+    static deserializeBinaryFromReader(message: DisconnectReq, reader: jspb.BinaryReader): DisconnectReq;
 }
 
-export namespace DeactiveReq {
+export namespace DisconnectReq {
     export type AsObject = {
-        token: string,
+        nspname: string,
         userid: number,
     }
 }
 
-export class DeactiveResp extends jspb.Message { 
+export class DisconnectResp extends jspb.Message { 
     getErrcode(): number;
     setErrcode(value: number): void;
 
@@ -252,23 +252,103 @@ export class DeactiveResp extends jspb.Message {
 
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): DeactiveResp.AsObject;
-    static toObject(includeInstance: boolean, msg: DeactiveResp): DeactiveResp.AsObject;
+    toObject(includeInstance?: boolean): DisconnectResp.AsObject;
+    static toObject(includeInstance: boolean, msg: DisconnectResp): DisconnectResp.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: DeactiveResp, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): DeactiveResp;
-    static deserializeBinaryFromReader(message: DeactiveResp, reader: jspb.BinaryReader): DeactiveResp;
+    static serializeBinaryToWriter(message: DisconnectResp, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): DisconnectResp;
+    static deserializeBinaryFromReader(message: DisconnectResp, reader: jspb.BinaryReader): DisconnectResp;
 }
 
-export namespace DeactiveResp {
+export namespace DisconnectResp {
     export type AsObject = {
         errcode: number,
         errmsg: string,
     }
 }
 
-export class ClearRoomReq extends jspb.Message { 
+export class KnockoutMeta extends jspb.Message { 
+    getUserid(): number;
+    setUserid(value: number): void;
+
+    getRoomid(): string;
+    setRoomid(value: string): void;
+
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): KnockoutMeta.AsObject;
+    static toObject(includeInstance: boolean, msg: KnockoutMeta): KnockoutMeta.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: KnockoutMeta, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): KnockoutMeta;
+    static deserializeBinaryFromReader(message: KnockoutMeta, reader: jspb.BinaryReader): KnockoutMeta;
+}
+
+export namespace KnockoutMeta {
+    export type AsObject = {
+        userid: number,
+        roomid: string,
+    }
+}
+
+export class KnockoutReq extends jspb.Message { 
+    getNspname(): string;
+    setNspname(value: string): void;
+
+    clearMetasList(): void;
+    getMetasList(): Array<KnockoutMeta>;
+    setMetasList(value: Array<KnockoutMeta>): void;
+    addMetas(value?: KnockoutMeta, index?: number): KnockoutMeta;
+
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): KnockoutReq.AsObject;
+    static toObject(includeInstance: boolean, msg: KnockoutReq): KnockoutReq.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: KnockoutReq, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): KnockoutReq;
+    static deserializeBinaryFromReader(message: KnockoutReq, reader: jspb.BinaryReader): KnockoutReq;
+}
+
+export namespace KnockoutReq {
+    export type AsObject = {
+        nspname: string,
+        metasList: Array<KnockoutMeta.AsObject>,
+    }
+}
+
+export class KnockoutResp extends jspb.Message { 
+    getErrcode(): number;
+    setErrcode(value: number): void;
+
+    getErrmsg(): string;
+    setErrmsg(value: string): void;
+
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): KnockoutResp.AsObject;
+    static toObject(includeInstance: boolean, msg: KnockoutResp): KnockoutResp.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: KnockoutResp, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): KnockoutResp;
+    static deserializeBinaryFromReader(message: KnockoutResp, reader: jspb.BinaryReader): KnockoutResp;
+}
+
+export namespace KnockoutResp {
+    export type AsObject = {
+        errcode: number,
+        errmsg: string,
+    }
+}
+
+export class ClearRoomsReq extends jspb.Message { 
+    getNspname(): string;
+    setNspname(value: string): void;
+
     clearRoomidsList(): void;
     getRoomidsList(): Array<string>;
     setRoomidsList(value: Array<string>): void;
@@ -276,22 +356,23 @@ export class ClearRoomReq extends jspb.Message {
 
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): ClearRoomReq.AsObject;
-    static toObject(includeInstance: boolean, msg: ClearRoomReq): ClearRoomReq.AsObject;
+    toObject(includeInstance?: boolean): ClearRoomsReq.AsObject;
+    static toObject(includeInstance: boolean, msg: ClearRoomsReq): ClearRoomsReq.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: ClearRoomReq, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): ClearRoomReq;
-    static deserializeBinaryFromReader(message: ClearRoomReq, reader: jspb.BinaryReader): ClearRoomReq;
+    static serializeBinaryToWriter(message: ClearRoomsReq, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): ClearRoomsReq;
+    static deserializeBinaryFromReader(message: ClearRoomsReq, reader: jspb.BinaryReader): ClearRoomsReq;
 }
 
-export namespace ClearRoomReq {
+export namespace ClearRoomsReq {
     export type AsObject = {
+        nspname: string,
         roomidsList: Array<string>,
     }
 }
 
-export class ClearRoomResp extends jspb.Message { 
+export class ClearRoomsResp extends jspb.Message { 
     getErrcode(): number;
     setErrcode(value: number): void;
 
@@ -300,16 +381,16 @@ export class ClearRoomResp extends jspb.Message {
 
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): ClearRoomResp.AsObject;
-    static toObject(includeInstance: boolean, msg: ClearRoomResp): ClearRoomResp.AsObject;
+    toObject(includeInstance?: boolean): ClearRoomsResp.AsObject;
+    static toObject(includeInstance: boolean, msg: ClearRoomsResp): ClearRoomsResp.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: ClearRoomResp, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): ClearRoomResp;
-    static deserializeBinaryFromReader(message: ClearRoomResp, reader: jspb.BinaryReader): ClearRoomResp;
+    static serializeBinaryToWriter(message: ClearRoomsResp, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): ClearRoomsResp;
+    static deserializeBinaryFromReader(message: ClearRoomsResp, reader: jspb.BinaryReader): ClearRoomsResp;
 }
 
-export namespace ClearRoomResp {
+export namespace ClearRoomsResp {
     export type AsObject = {
         errcode: number,
         errmsg: string,

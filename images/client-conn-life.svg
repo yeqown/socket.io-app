@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xl="http://www.w3.org/1999/xlink" version="1.1" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/2000/svg" viewBox="-384.3 1680 1167.3 1193.093" width="1167.3" height="1193.093">
+  <defs>
+    <font-face font-family="Avenir" font-size="13" panose-1="2 11 7 3 2 2 3 2 2 4" units-per-em="1000" underline-position="-75" underline-thickness="50" slope="0" x-height="480" cap-height="708" ascent="1e3" descent="-365.9973" font-weight="800">
+      <font-face-src>
+        <font-face-name name="Avenir-Heavy"/>
+      </font-face-src>
+    </font-face>
+    <font-face font-family="Avenir" font-size="12" panose-1="2 11 7 3 2 2 3 2 2 4" units-per-em="1000" underline-position="-75" underline-thickness="50" slope="0" x-height="480" cap-height="708" ascent="1e3" descent="-365.9973" font-weight="800">
+      <font-face-src>
+        <font-face-name name="Avenir-Heavy"/>
+      </font-face-src>
+    </font-face>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -4 8 8" markerWidth="8" markerHeight="8" color="#666a6b">
+      <g>
+        <path d="M 5.76 0 L 0 -2.16 L 0 2.16 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+    <font-face font-family="PingFang SC" font-size="12" panose-1="2 11 4 0 0 0 0 0 0 0" units-per-em="1000" underline-position="-150" underline-thickness="58" slope="0" x-height="600" cap-height="860" ascent="1060.0021" descent="-340.0007" font-weight="400">
+      <font-face-src>
+        <font-face-name name="PingFangSC-Regular"/>
+      </font-face-src>
+    </font-face>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="StickArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-6 -3 7 6" markerWidth="7" markerHeight="6" color="#666a6b">
+      <g>
+        <path d="M -4.8 0 L 0 0 M 0 1.8 L -4.8 0 L 0 -1.8" fill="none" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+    <font-face font-family="Avenir" font-size="12" panose-1="2 11 5 3 2 2 3 2 2 4" units-per-em="1000" underline-position="-75" underline-thickness="50" slope="0" x-height="468" cap-height="708" ascent="1e3" descent="-365.9973" font-weight="400">
+      <font-face-src>
+        <font-face-name name="Avenir-Roman"/>
+      </font-face-src>
+    </font-face>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="StickArrow_Marker_2" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-7 -4 8 8" markerWidth="8" markerHeight="8" color="#666a6b">
+      <g>
+        <path d="M -5.76 0 L 0 0 M 0 2.16 L -5.76 0 L 0 -2.16" fill="none" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+  </defs>
+  <metadata> Produced by OmniGraffle 7.11.2 
+    <dc:date>2019-09-09 02:45:55 +0000</dc:date>
+  </metadata>
+  <g id="版面__-1" stroke="none" fill-opacity="1" fill="none" stroke-dasharray="none" stroke-opacity="1">
+    <title>时序图</title>
+    <g id="版面__-1: 客户端生命周期">
+      <title>客户端生命周期</title>
+      <g id="Group_2">
+        <title>Class Role</title>
+        <g id="Graphic_5">
+          <title>Object</title>
+          <rect x="-92.8" y="1681" width="130" height="42" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+          <text transform="translate(-86.8 1693)" fill="#515556">
+            <tspan font-family="Avenir" font-size="13" font-weight="800" fill="#515556" x="12.655" y="13">Server.socketio</tspan>
+          </text>
+        </g>
+        <g id="Line_4">
+          <title>Lifeline</title>
+          <line x1="-27.8" y1="1724" x2="-27.8" y2="2867.442" stroke="#8b8b8b" stroke-linecap="square" stroke-linejoin="bevel" stroke-dasharray="8.0,8.0" stroke-width="2"/>
+        </g>
+        <g id="Graphic_3">
+          <title>Activation</title>
+          <rect x="-37.8" y="1829.5298" width="20" height="260.47022" fill="white"/>
+          <rect x="-37.8" y="1829.5298" width="20" height="260.47022" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        </g>
+      </g>
+      <g id="Group_6">
+        <title>Class Role</title>
+        <g id="Graphic_9">
+          <title>Object</title>
+          <rect x="-279" y="1683.2615" width="130" height="36.73846" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+          <text transform="translate(-273 1692.6308)" fill="#515556">
+            <tspan font-family="Avenir" font-size="13" font-weight="800" fill="#515556" x="41.1705" y="13">Client</tspan>
+          </text>
+        </g>
+        <g id="Line_8">
+          <title>Lifeline</title>
+          <line x1="-214" y1="1721" x2="-214" y2="2872.093" stroke="#8b8b8b" stroke-linecap="square" stroke-linejoin="bevel" stroke-dasharray="8.0,8.0" stroke-width="2"/>
+        </g>
+        <g id="Graphic_7">
+          <title>Activation</title>
+          <rect x="-224" y="1822" width="20" height="271.4815" fill="white"/>
+          <rect x="-224" y="1822" width="20" height="271.4815" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        </g>
+      </g>
+      <g id="Group_10">
+        <title>Class Role</title>
+        <g id="Graphic_13">
+          <title>Object</title>
+          <rect x="652" y="1684.7692" width="130" height="36.64935" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+          <text transform="translate(658 1695.094)" fill="#515556">
+            <tspan font-family="Avenir" font-size="12" font-weight="800" fill="#515556" x="23.444" y="12">Server.Onoff</tspan>
+          </text>
+        </g>
+        <g id="Line_12">
+          <title>Lifeline</title>
+          <line x1="717" y1="1722.4186" x2="717" y2="2867.442" stroke="#8b8b8b" stroke-linecap="square" stroke-linejoin="bevel" stroke-dasharray="8.0,8.0" stroke-width="2"/>
+        </g>
+        <g id="Graphic_11">
+          <title>Activation</title>
+          <rect x="707" y="2e3" width="20" height="36.64935" fill="white"/>
+          <rect x="707" y="2e3" width="20" height="36.64935" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        </g>
+      </g>
+      <g id="Group_14">
+        <title>Class Role</title>
+        <g id="Graphic_17">
+          <title>Object</title>
+          <rect x="465.8" y="1684.0154" width="130" height="36.64935" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+          <text transform="translate(471.8 1693.34)" fill="#515556">
+            <tspan font-family="Avenir" font-size="13" font-weight="800" fill="#515556" x="15.4305" y="13">Server.Session</tspan>
+          </text>
+        </g>
+        <g id="Line_16">
+          <title>Lifeline</title>
+          <line x1="530.8" y1="1721.6647" x2="530.8" y2="2872.093" stroke="#8b8b8b" stroke-linecap="square" stroke-linejoin="bevel" stroke-dasharray="8.0,8.0" stroke-width="2"/>
+        </g>
+        <g id="Graphic_15">
+          <title>Activation</title>
+          <rect x="520.8" y="2032" width="20" height="27.478595" fill="white"/>
+          <rect x="520.8" y="2032" width="20" height="27.478595" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        </g>
+      </g>
+      <g id="Group_18">
+        <title>Class Role</title>
+        <g id="Graphic_21">
+          <title>Object</title>
+          <rect x="279.6" y="1682.5077" width="130" height="35.492308" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+          <text transform="translate(285.6 1691.2538)" fill="#515556">
+            <tspan font-family="Avenir" font-size="13" font-weight="800" fill="#515556" x="23.3605" y="13">Server.Auth</tspan>
+          </text>
+        </g>
+        <g id="Line_20">
+          <title>Lifeline</title>
+          <line x1="344.6" y1="1719" x2="344.6" y2="2872.093" stroke="#8b8b8b" stroke-linecap="square" stroke-linejoin="bevel" stroke-dasharray="8.0,8.0" stroke-width="2"/>
+        </g>
+        <g id="Graphic_19">
+          <title>Activation</title>
+          <rect x="334.6" y="2003.591" width="20" height="69.47173" fill="white"/>
+          <rect x="334.6" y="2003.591" width="20" height="69.47173" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        </g>
+      </g>
+      <g id="Group_22">
+        <title>Class Role</title>
+        <g id="Graphic_25">
+          <title>Object</title>
+          <rect x="93.4" y="1681.7538" width="130" height="45" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+          <text transform="translate(99.4 1695.2538)" fill="#515556">
+            <tspan font-family="Avenir" font-size="13" font-weight="800" fill="#515556" x="27.3385" y="13">Server.nsp</tspan>
+          </text>
+        </g>
+        <g id="Line_24">
+          <title>Lifeline</title>
+          <line x1="158.4" y1="1727.7538" x2="158.4" y2="2872.093" stroke="#8b8b8b" stroke-linecap="square" stroke-linejoin="bevel" stroke-dasharray="8.0,8.0" stroke-width="2"/>
+        </g>
+        <g id="Graphic_23">
+          <title>Activation</title>
+          <rect x="148.4" y="1906.7794" width="20" height="174.37338" fill="white"/>
+          <rect x="148.4" y="1906.7794" width="20" height="174.37338" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        </g>
+      </g>
+      <g id="Graphic_26">
+        <title>Activation</title>
+        <rect x="-224" y="2135" width="20" height="71.5" fill="white"/>
+        <rect x="-224" y="2135" width="20" height="71.5" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Group_27">
+        <g id="Graphic_30"/>
+        <g id="Line_29">
+          <title>Synchronous</title>
+          <line x1="-197" y1="1834.5" x2="-59.82" y2="1834.5" marker-end="url(#FilledArrow_Marker)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-width="2"/>
+        </g>
+        <g id="Graphic_28">
+          <text transform="translate(-148.99 1812.1771)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="0" y="13">1.三次握手</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_31">
+        <g id="Graphic_34"/>
+        <g id="Line_33">
+          <title>Synchronous</title>
+          <line x1="-10.7" y1="1920.4" x2="126.48" y2="1920.4" marker-end="url(#FilledArrow_Marker)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-width="2"/>
+        </g>
+        <g id="Graphic_32">
+          <text transform="translate(-7.2794805 1889.5771)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="18.93092" y="13">3. 触发Connection</tspan>
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="33.08492" y="30">等待Auth事件</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_35">
+        <g id="Graphic_38"/>
+        <g id="Line_37">
+          <title>Synchronous</title>
+          <line x1="175.5" y1="2019" x2="312.68" y2="2019" marker-end="url(#FilledArrow_Marker)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-width="2"/>
+        </g>
+        <g id="Graphic_36">
+          <text transform="translate(220.318 1996.6771)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="6963319e-19" y="13">6. 调用鉴权</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_39">
+        <g id="Graphic_42"/>
+        <g id="Line_41">
+          <title>Synchronous</title>
+          <line x1="-184.1" y1="1874.3229" x2="-45" y2="1874.3229" marker-start="url(#StickArrow_Marker)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-dasharray="8.0,8.0" stroke-width="2"/>
+        </g>
+        <g id="Graphic_40">
+          <text transform="translate(-151.672 1852)" fill="#515556">
+            <tspan font-family="Avenir" font-size="12" font-weight="400" fill="#515556" x="47961635e-20" y="13">2. </tspan>
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" y="13">建立链接</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_43">
+        <g id="Graphic_46"/>
+        <g id="Line_45">
+          <title>Synchronous</title>
+          <line x1="-197" y1="2000.5" x2="-59.82" y2="2000.5" marker-end="url(#FilledArrow_Marker)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-width="2"/>
+        </g>
+        <g id="Graphic_44">
+          <text transform="translate(-162.952 1978.1771)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="0" y="13">4.发送Auth事件</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_47">
+        <g id="Graphic_50"/>
+        <g id="Line_49">
+          <title>Synchronous</title>
+          <line x1="1.9871212" y1="1951.8229" x2="141.08712" y2="1951.8229" marker-start="url(#StickArrow_Marker)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-dasharray="8.0,8.0" stroke-width="2"/>
+        </g>
+        <g id="Graphic_48">
+          <text transform="translate(2.32112 1929.5)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="0" y="13">等待Auth 超时关闭链接</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_51">
+        <g id="Graphic_54"/>
+        <g id="Line_53">
+          <title>Synchronous</title>
+          <line x1="-10.7" y1="2e3" x2="126.48" y2="2e3" marker-end="url(#FilledArrow_Marker)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-width="2"/>
+        </g>
+        <g id="Graphic_52">
+          <text transform="translate(23.348 1977.6771)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="0" y="13">5.触发Auth事件</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_55">
+        <g id="Graphic_58"/>
+        <g id="Line_57">
+          <title>Synchronous</title>
+          <line x1="188.5" y1="2064.8229" x2="327.6" y2="2064.8229" marker-start="url(#StickArrow_Marker)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-dasharray="8.0,8.0" stroke-width="2"/>
+        </g>
+        <g id="Graphic_56">
+          <text transform="translate(220.928 2042.5)" fill="#515556">
+            <tspan font-family="Avenir" font-size="12" font-weight="400" fill="#515556" x="47961635e-20" y="13">7. </tspan>
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" y="13">鉴权结果</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_59">
+        <g id="Graphic_62"/>
+        <g id="Line_61">
+          <title>Synchronous with Immediate Return</title>
+          <line x1="381.82" y1="2046.4786" x2="494.18" y2="2046.4786" marker-end="url(#FilledArrow_Marker)" marker-start="url(#StickArrow_Marker_2)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-width="2"/>
+        </g>
+        <g id="Graphic_60">
+          <text transform="translate(399.474 2024.1557)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="0" y="13">9. 注册</tspan>
+            <tspan font-family="Avenir" font-size="12" font-weight="400" fill="#515556" y="13">session</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_63">
+        <g id="Graphic_66">
+          <text transform="translate(-190.15 2062.5)" fill="#515556">
+            <tspan font-family="Avenir" font-size="12" font-weight="400" fill="#515556" x="33.680333" y="12">9. AuthReply</tspan>
+          </text>
+        </g>
+        <g id="Line_65">
+          <title>Synchronous</title>
+          <line x1="-182.25" y1="2080.8229" x2="-43.15" y2="2080.8229" marker-start="url(#StickArrow_Marker)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-dasharray="8.0,8.0" stroke-width="2"/>
+        </g>
+        <g id="Graphic_64"/>
+      </g>
+      <g id="Group_67">
+        <g id="Graphic_70"/>
+        <g id="Line_69">
+          <title>Synchronous</title>
+          <line x1="-370.4" y1="2028.8229" x2="-231.3" y2="2028.8229" marker-start="url(#StickArrow_Marker)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-dasharray="8.0,8.0" stroke-width="2"/>
+        </g>
+        <g id="Graphic_68">
+          <text transform="translate(-373.354 2006.5)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="8526513e-20" y="13">AuthReply 超时关闭链接</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Graphic_71">
+        <title>Activation</title>
+        <rect x="-37.8" y="2135" width="20" height="71.5" fill="white"/>
+        <rect x="-37.8" y="2135" width="20" height="71.5" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Group_72">
+        <g id="Graphic_75"/>
+        <g id="Line_74">
+          <title>Synchronous with Immediate Return</title>
+          <line x1="381.82" y1="2013.6087" x2="683.18" y2="2013.6087" marker-end="url(#FilledArrow_Marker)" marker-start="url(#StickArrow_Marker_2)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-width="2"/>
+        </g>
+        <g id="Graphic_73">
+          <text transform="translate(581.33464 1991.2858)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="6963319e-19" y="13">8. 触发上线</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_76">
+        <g id="Graphic_79"/>
+        <g id="Line_78">
+          <title>Synchronous with Immediate Return</title>
+          <line x1="-173.28" y1="2167" x2="-65.02" y2="2167" marker-end="url(#FilledArrow_Marker)" marker-start="url(#StickArrow_Marker_2)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-width="2"/>
+        </g>
+        <g id="Graphic_77">
+          <text transform="translate(-161.15 2144.6771)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="0" y="13">接收消息和确认</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Graphic_80">
+        <title>Activation</title>
+        <rect x="-223.175" y="2289" width="20" height="45" fill="white"/>
+        <rect x="-223.175" y="2289" width="20" height="45" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Graphic_81">
+        <title>Activation</title>
+        <rect x="-37.8" y="2246.5" width="20" height="73.39681" fill="white"/>
+        <rect x="-37.8" y="2246.5" width="20" height="73.39681" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Group_82">
+        <g id="Graphic_85"/>
+        <g id="Line_84">
+          <title>Synchronous</title>
+          <line x1="-180.525" y1="2307.7197" x2="-48.575" y2="2307.7197" marker-start="url(#StickArrow_Marker)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-dasharray="8.0,8.0" stroke-width="2"/>
+        </g>
+        <g id="Graphic_83">
+          <text transform="translate(-163 2285.3968)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="0" y="13">服务端主动关闭</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Graphic_86">
+        <title>Activation</title>
+        <rect x="-224" y="2456" width="20" height="173" fill="white"/>
+        <rect x="-224" y="2456" width="20" height="173" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Group_87">
+        <g id="Graphic_90"/>
+        <g id="Line_89">
+          <title>Synchronous</title>
+          <line x1="-193.425" y1="2475.3556" x2="-63.395" y2="2475.3556" marker-end="url(#FilledArrow_Marker)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-width="2"/>
+        </g>
+        <g id="Graphic_88">
+          <text transform="translate(-151 2453.0327)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="0" y="13">客户端关闭</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Graphic_91">
+        <title>Activation</title>
+        <rect x="-38" y="2468" width="20" height="161" fill="white"/>
+        <rect x="-38" y="2468" width="20" height="161" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Graphic_92">
+        <title>Activation</title>
+        <rect x="148.4" y="2511" width="20" height="79" fill="white"/>
+        <rect x="148.4" y="2511" width="20" height="79" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Group_93">
+        <g id="Graphic_96"/>
+        <g id="Line_95">
+          <title>Synchronous</title>
+          <path d="M -7.425 2525.3556 L 62.26256 2523.8358 L 122.60803 2525.056" marker-end="url(#FilledArrow_Marker)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-width="2"/>
+        </g>
+        <g id="Graphic_94">
+          <text transform="translate(22.228274 2501.571)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="0" y="13">触发Disconnect</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Graphic_97">
+        <title>Activation</title>
+        <rect x="519.975" y="2565" width="20" height="33" fill="white"/>
+        <rect x="519.975" y="2565" width="20" height="33" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Graphic_98">
+        <title>Activation</title>
+        <rect x="707.2" y="2519" width="20" height="33" fill="white"/>
+        <rect x="707.2" y="2519" width="20" height="33" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Group_99">
+        <g id="Graphic_102"/>
+        <g id="Line_101">
+          <title>Synchronous with Immediate Return</title>
+          <line x1="196.22" y1="2525.5" x2="683.18" y2="2525.5" marker-end="url(#FilledArrow_Marker)" marker-start="url(#StickArrow_Marker_2)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-width="2"/>
+        </g>
+        <g id="Graphic_100">
+          <text transform="translate(587.3371 2503.177)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="0" y="13">触发下线</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_103">
+        <g id="Graphic_106"/>
+        <g id="Line_105">
+          <title>Synchronous with Immediate Return</title>
+          <line x1="196.22" y1="2577" x2="494.18" y2="2577" marker-end="url(#FilledArrow_Marker)" marker-start="url(#StickArrow_Marker_2)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-width="2"/>
+        </g>
+        <g id="Graphic_104">
+          <text transform="translate(382.81625 2554.677)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="0" y="13">清除session</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_107">
+        <g id="Graphic_110"/>
+        <g id="Line_109">
+          <title>Synchronous</title>
+          <line x1="5.775" y1="2571.323" x2="137.725" y2="2571.323" marker-start="url(#StickArrow_Marker)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-dasharray="8.0,8.0" stroke-width="2"/>
+        </g>
+        <g id="Graphic_108">
+          <text transform="translate(41.299997 2549)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="0" y="13">确认关闭</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_111">
+        <g id="Graphic_114"/>
+        <g id="Line_113">
+          <title>Synchronous</title>
+          <line x1="-180.525" y1="2607.823" x2="-48.575" y2="2607.823" marker-start="url(#StickArrow_Marker)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-dasharray="8.0,8.0" stroke-width="2"/>
+        </g>
+        <g id="Graphic_112">
+          <text transform="translate(-145 2585.5)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="0" y="13">断开链接</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Graphic_115">
+        <title>Activation</title>
+        <rect x="522.5" y="2274.8968" width="20" height="27.478595" fill="white"/>
+        <rect x="522.5" y="2274.8968" width="20" height="27.478595" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Graphic_116">
+        <title>Activation</title>
+        <rect x="707" y="2238" width="20" height="36.64935" fill="white"/>
+        <rect x="707" y="2238" width="20" height="36.64935" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Graphic_117">
+        <title>Activation</title>
+        <rect x="148.4" y="2238" width="20" height="71.5" fill="white"/>
+        <rect x="148.4" y="2238" width="20" height="71.5" stroke="#b9c0c1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Group_118">
+        <g id="Graphic_121"/>
+        <g id="Line_120">
+          <title>Synchronous</title>
+          <line x1="5.775" y1="2254.8229" x2="137.725" y2="2254.8229" marker-start="url(#StickArrow_Marker)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-dasharray="8.0,8.0" stroke-width="2"/>
+        </g>
+        <g id="Graphic_119">
+          <text transform="translate(29.299997 2232.5)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="0" y="13">关闭某一链接</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_122">
+        <g id="Graphic_125"/>
+        <g id="Line_124">
+          <title>Synchronous with Immediate Return</title>
+          <line x1="190.42" y1="2254" x2="683.18" y2="2254" marker-end="url(#FilledArrow_Marker)" marker-start="url(#StickArrow_Marker_2)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-width="2"/>
+        </g>
+        <g id="Graphic_123">
+          <text transform="translate(584.4945 2231.6771)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="0" y="13">触发下线</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_126">
+        <g id="Graphic_129"/>
+        <g id="Line_128">
+          <title>Synchronous with Immediate Return</title>
+          <line x1="193.895" y1="2294.75" x2="495.255" y2="2294.75" marker-end="url(#FilledArrow_Marker)" marker-start="url(#StickArrow_Marker_2)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-width="2"/>
+        </g>
+        <g id="Graphic_127">
+          <text transform="translate(386.95927 2272.4271)" fill="#515556">
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" x="0" y="13">清理Session</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_130">
+        <g id="Graphic_133"/>
+        <g id="Line_132">
+          <title>Synchronous</title>
+          <line x1="5.775" y1="2064.8229" x2="144.875" y2="2064.8229" marker-start="url(#StickArrow_Marker)" stroke="#666a6b" stroke-linecap="square" stroke-linejoin="bevel" stroke-dasharray="8.0,8.0" stroke-width="2"/>
+        </g>
+        <g id="Graphic_131">
+          <text transform="translate(34.147 2042.5)" fill="#515556">
+            <tspan font-family="Avenir" font-size="12" font-weight="400" fill="#515556" x="0" y="13">8. </tspan>
+            <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="#515556" y="13">AuthReply</tspan>
+          </text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

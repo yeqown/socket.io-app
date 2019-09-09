@@ -6,7 +6,7 @@
 // import bluebird from 'bluebird'
 // import * as redis from 'redis'
 import { RedisClient, createClient, ClientOpts } from 'redis'
-import { logger } from '../utils/logger'
+import log4js, { Logger } from 'log4js'
 // import { Config } from '../utils/confs'
 // import { promisify } from 'util'
 
@@ -18,7 +18,7 @@ import { logger } from '../utils/logger'
 
 let redisClient: RedisClient
 
-export const initialRedis = (opt: ClientOpts) => {
+const initialRedis = (opt: ClientOpts) => {
     // let redisClientOpts: ClientOpts = {
     //     port: opt.port,
     //     host: opt.host,
@@ -37,4 +37,25 @@ export const initialRedis = (opt: ClientOpts) => {
     // }
 }
 
-export { redisClient }
+
+let logger: log4js.Logger
+
+const configureLogger = (conf: string): Logger | null => {
+    let { NODE_ENV } = process.env
+
+    try {
+        log4js.configure(conf)
+        if (NODE_ENV && NODE_ENV === 'dev') {
+            logger = log4js.getLogger("default")
+        } else {
+            logger = log4js.getLogger("file")
+        }
+        return logger
+    } catch (err) {
+        console.log("could not configure logger: ", err);
+    }
+
+    return null
+}
+
+export { redisClient, initialRedis, logger, configureLogger }

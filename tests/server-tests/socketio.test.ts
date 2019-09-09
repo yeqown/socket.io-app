@@ -12,20 +12,20 @@ suiteTeardown(() => {
 })
 
 describe("socketioServers", () => {
-    let addr = "http://localhost:3000/demo"
+    let nspName = "demo"
+    let addr = "http://localhost:3000" + "/" + nspName
     let path = "socket.io"
 
     it("client connect", () => {
-        let err: Error | null = null
         try {
             client = io(addr, { path: path })
             let msg: proto.IMessage = new proto.Message({ content: "msg" }, "chat/users")
-            let uMsg: proto.IUsersMessage = new proto.UsersMessage(2222, msg)
+            let uMsg: proto.IUsersMessage = new proto.UsersMessage(nspName, 2222, msg)
             client.emit("chat/users", uMsg)
         } catch (err) {
-            console.log(err);
-            err = err
+            // console.log(err);
+            // err = err
+            assert(err === null)
         }
-        assert(err === null)
     })
 })

@@ -37,29 +37,35 @@ class Message implements IMessage {
 
 interface IRoomsMessage {
     roomId: Required<string>,
+    nspName: Required<string>
     msg: Required<IMessage>,
 }
 
 class RoomsMessage implements IRoomsMessage {
     roomId: Required<string>
+    nspName: Required<string>
     msg: Required<IMessage>
 
-    constructor(roomId: string, msg: IMessage) {
+    constructor(nspName: string, roomId: string, msg: IMessage) {
+        this.nspName = nspName
         this.roomId = roomId
         this.msg = msg
     }
 }
 
 interface IUsersMessage {
+    nspName: Required<string>,
     userId: Required<number>,
     msg: Required<IMessage>,
 }
 
 class UsersMessage implements IUsersMessage {
+    nspName: string
     userId: number
     msg: IMessage
 
-    constructor(userId: Required<number>, msg: Required<IMessage>) {
+    constructor(nspName: string, userId: number, msg: IMessage) {
+        this.nspName = nspName
         this.userId = userId
         this.msg = msg
     }

@@ -1,3 +1,8 @@
+## RPC APIs
+
+### API.PROTO
+
+```proto
 syntax = "proto3";
 
 // import "google/protobuf/any.proto";
@@ -101,3 +106,8 @@ message Message {
     string evt = 3;
     string id = 4;
 } 
+```
+
+### generated files
+
+all in [codegen](../src/codegen/api)

@@ -1,6 +1,6 @@
 import { IOnoff } from '../types'
 import { getNowTimestamp } from '../utils'
-import { logger } from '../utils/logger'
+import { logger } from '../utils/ins'
 import { RedisClient } from 'redis'
 
 
@@ -83,7 +83,7 @@ class OnoffEmitterBasedRedis implements IOnoffEmitter {
     }
 
     /**
-     * 
+     * off means offline
      * @param nspName 
      * @param data 
      */
@@ -101,7 +101,7 @@ class OnoffEmitterBasedRedis implements IOnoffEmitter {
     }
 
     /**
-     * 
+     * on means online
      * @param nspName 
      * @param data 
      */
