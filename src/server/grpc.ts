@@ -1,10 +1,9 @@
 import grpc, { GrpcObject } from "grpc"
 import grpc_pb from '../codegen/api/api_grpc_pb'
 import api_pb from "../codegen/api/api_pb";
-import { logger } from '../utils/logger'
-import { codes, getMessage } from '../utils/codes'
+import { logger } from '../utils/ins'
 import { SocketioWrapper } from "./socketio";
-import { proto, GrpcServerOptions } from "../types";
+import { proto, GrpcServerOptions, codes, getMessage } from "../types";
 
 
 class gRPCService {

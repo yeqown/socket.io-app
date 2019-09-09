@@ -1,5 +1,3 @@
-import { log } from "util"
-
 export interface ISession {
     userId: number,
     socketId: string,

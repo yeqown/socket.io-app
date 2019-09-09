@@ -4,16 +4,17 @@ import io from 'socket.io'
 import express from 'express'
 import { Request, Response } from "express";
 import http from 'http'
+import { RedisClient } from 'redis'
+
 import { proto, IJoinRoomsReq, AuthReq, IAuthReq, SocketioOptions } from '../types'
+import { codes, getMessage } from '../utils'
+import { logger } from '../utils/ins'
 import {
     ISessionManager, IOnoffEmitter,
     SManagerBasedRedis, OnoffEmitterBasedRedis, OnoffMsg, EventType, ITokenr, DesTokenr,
-    INspConfiger, INspConfig, NspConfigRepo, NspConfig,
+    INspConfiger, INspConfig, NspConfigRepo,
 } from '../logic'
 
-import { codes, getMessage } from '../utils'
-import { logger } from '../utils/logger'
-import { RedisClient } from 'redis';
 
 const _logicErrorEvt = "logic/error"
 
@@ -77,7 +78,7 @@ class SocketioWrapper {
         this.port = opt.port || 3000
 
         this._sm = new SManagerBasedRedis(rc)
-        this._nspConfiger = new NspConfigRepo()
+        this._nspConfiger = new NspConfigRepo(rc)
         this._onoffEmitter = new OnoffEmitterBasedRedis(rc)
         this._auth = new DesTokenr()
 

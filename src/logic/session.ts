@@ -1,6 +1,6 @@
 import { RedisClient } from "redis"
 import { IAuthReq, Session, ISession, Err } from "../types"
-import { logger } from "../utils/logger"
+import { logger } from "../utils/ins"
 import { promisify, CustomPromisify } from 'util'
 
 interface ISessionManager {

@@ -1,6 +1,6 @@
 import { IOnoff } from '../types'
 import { getNowTimestamp } from '../utils'
-import { logger } from '../utils/logger'
+import { logger } from '../utils/ins'
 import { RedisClient } from 'redis'
 
 

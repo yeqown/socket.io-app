@@ -1,6 +1,6 @@
 import { ClientOpts } from 'redis'
 import { readFileSync } from 'fs'
-import { logger } from './logger'
+import { logger } from '../utils/ins'
 import { SocketioOptions, GrpcServerOptions } from '../types'
 
 class Config {

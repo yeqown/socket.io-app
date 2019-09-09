@@ -57,6 +57,7 @@ const main = () => {
 
             let t = setInterval(function () {
                 let roomId = roomIds[Math.floor(Math.random() * 10) % roomIds.length]
+                console.log(`sending a message to ${roomId}`);
                 client.sendInRoom(roomId, { content: "interval", roomId: roomId })
             }, 5000)
         })
