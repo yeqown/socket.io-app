@@ -6,8 +6,8 @@ import { Request, Response } from "express";
 import http from 'http'
 import { RedisClient } from 'redis'
 
-import { proto, IJoinRoomsReq, AuthReq, IAuthReq, SocketioOptions } from '../types'
-import { codes, getMessage } from '../utils'
+import { proto, IJoinRoomsReq, AuthReq, IAuthReq, SocketioOptions, ISession } from '../types'
+import { codes, getMessage, addSlashLeft } from '../utils'
 import { logger } from '../utils/ins'
 import {
     ISessionManager, IOnoffEmitter,
@@ -98,6 +98,17 @@ class SocketioWrapper {
     }
 
     /**
+   * open socket.io server 
+   * 1. createNsp from configs , if no configs just skip this step
+   * 2. serving nsps
+   */
+    serve = () => {
+        this._httpSrv.listen(this.port, () => {
+            logger.info("running on: ", this.port)
+        })
+    }
+
+    /**
      * creata an Nsp and listen evt on it
      */
     createNsp = (nspCfg: INspConfig): Error | null => {
@@ -123,6 +134,7 @@ class SocketioWrapper {
      * @param nspName
      */
     removeNsp = (nspName: string): Error | null => {
+        nspName = addSlashLeft(nspName)
         let _nsp = this._nsps.get(nspName)
         if (_nsp === undefined) {
             let err = new Error("undefined nsp")
@@ -136,17 +148,27 @@ class SocketioWrapper {
         return null
     }
 
+
+    private _authed(socketId: string): boolean {
+        return (this._sockets.get(socketId) !== undefined)
+    }
+
+    /**
+     * _mountNsps loads all nsp configs from configer then
+     * register nsp into socket.io also handlers to evts includes built-in and custom
+     */
     private _mountNsps = () => {
         let nspCfgs = this._nspConfiger.allNsp()
         nspCfgs.forEach((cfg: INspConfig) => {
-            if (this._nsps.get(cfg.name)) {
-                logger.error("duplicate nsp name config: ", cfg.name)
+            let nspName = addSlashLeft(cfg.name)
+            if (this._nsps.get(nspName)) {
+                logger.error("duplicate nsp name config: ", nspName)
                 return
             }
 
             // register handlers
-            logger.info("generate nsp name: ", cfg.name, "evts:", cfg.listenEvts)
-            let _nsp = this._io.of(cfg.name)
+            logger.info("generate nsp name: ", nspName, "evts:", cfg.listenEvts)
+            let _nsp = this._io.of(nspName)
 
             // TODO: using middleware
             // _nsp.use((socket: io.Socket, next: (err?: any) => void): void => {
@@ -160,7 +182,7 @@ class SocketioWrapper {
             })
 
             // record nsp
-            this._nsps.set(cfg.name, _nsp)
+            this._nsps.set(nspName, _nsp)
         })
 
         // TODO:
@@ -174,15 +196,11 @@ class SocketioWrapper {
         // })
     }
 
-    private _authed(socketId: string): boolean {
-        return (this._sockets.get(socketId) !== undefined)
-    }
-
     /**
      * hdl socket with it's evt
      * @param _nsp
      * @param socket
-     * TODO: handle more event: 
+     * handle more event: 
      * refer to: https://socket.io/docs/client-api/#Event-%E2%80%98connect-error%E2%80%99
      */
     private _hdlSocketConn = (_nsp: io.Namespace, socket: io.Socket, cfg: INspConfig) => {
@@ -195,7 +213,7 @@ class SocketioWrapper {
             // send an timeout error to client
             logger.error("connection refused: auth timeout")
             socket.emit(_logicErrorEvt, new Error(getMessage(codes.AuthTimeout)))
-            socket.disconnect()
+            socket.disconnect(true)
         }, 5000)
 
         // hdl disconnect evt
@@ -234,7 +252,7 @@ class SocketioWrapper {
                 if (this._sm.set(socket.id, _nsp.name, clientIp, req)) logger.error("could not set session")
             } else {
                 // auth failed
-                socket.disconnect()
+                socket.disconnect(true)
             }
         })
 
@@ -249,15 +267,18 @@ class SocketioWrapper {
         socket.on("chat/users", (uMsgs: proto.IUsersMessage[]) => {
             logger.info("chat/users recv msg: ", uMsgs)
             uMsgs.forEach((msg: proto.IUsersMessage) => {
-                let _sockid = msg.userId.toString()
-                let _socket = this._sockets.get(_sockid)
-                if (_socket) _socket.getSocket().emit(msg.msg.evt, msg.msg)
+                this._sm.queryByUserId(msg.userId, msg.nspName)
+                    .then((v: ISession | Error) => {
+                        if (v instanceof Error) { logger.error("could not get session by userId=", msg.userId); return }
+                        let _socket = this._sockets.get(v.socketId)
+                        if (_socket) _socket.getSocket().emit(msg.msg.evt, msg.msg)
+                    })
             })
         })
 
         socket.on("chat/rooms", (rMsgs: proto.IRoomsMessage[]) => {
             logger.info("recv broadcast_rooms msg", rMsgs)
-
+            // TODO: limits socket sending msg while it's been knockoutted
             rMsgs.forEach((msg: proto.IRoomsMessage) => {
                 _nsp.in(msg.roomId).emit(msg.msg.evt, msg.msg)
             })
@@ -280,34 +301,36 @@ class SocketioWrapper {
     }
 
     /**
-    * open socket.io server 
-    * 1. createNsp from configs , if no configs just skip this step
-    * 2. serving nsps
-    */
-    serve = () => {
-        this._httpSrv.listen(this.port, () => {
-            logger.info("running on: ", this.port)
-        })
-    }
-
+     * 
+     */
     private _mountHandlers = () => {
         this._app.get("/api/nsps/all", this.hdlGetAllNsps)
         this._app.get("/api/nsps/:nspName", this.hdlGetNsp)
     }
 
+    /**
+     * broadcast
+     * broadcast to all rooms in current nsp
+     */
     broadcast = (nspName: string, msg: proto.IMessage): void => {
+        nspName = addSlashLeft(nspName)
         const _nsp = this._nsps.get(nspName)
         if (_nsp === undefined) {
-            logger.error("could not get nsp by name: ", nspName)
+            logger.error(__filename, "could not get nsp by name: ", nspName)
             return
         }
         _nsp.emit(msg.evt, msg)
     }
 
+    /**
+     * broadcastRooms 
+     * broadcast msg to rooms
+     */
     broadcastRooms = (nspName: string, msgs: proto.IRoomsMessage[]): void => {
+        nspName = addSlashLeft(nspName)
         const _nsp = this._nsps.get(nspName)
-        if (_nsp === undefined) {
-            logger.error("could not get nsp by name: ", nspName)
+        if (!_nsp) {
+            logger.error(__filename, 332, "could not get nsp by name: ", nspName)
             return
         }
 
@@ -316,10 +339,15 @@ class SocketioWrapper {
         })
     }
 
+    /**
+     * broadcastUsers
+     * send msg to spec users
+     */
     broadcastUsers = (nspName: string, msgs: proto.IUsersMessage[]) => {
+        nspName = addSlashLeft(nspName)
         const _nsp = this._nsps.get(nspName)
-        if (_nsp === undefined) {
-            logger.error("could not get nsp by name: ", nspName)
+        if (!_nsp) {
+            logger.error(__filename, 349, "could not get nsp by name: ", nspName)
             return
         }
         msgs.forEach((uMsg: proto.IUsersMessage) => {
@@ -327,6 +355,79 @@ class SocketioWrapper {
         });
     }
 
+
+    /**
+     * deactiveByUserId disconnect
+     * disconnect with client by userId
+     */
+    deactiveByUserId = (nspName: string, userId: number) => {
+        nspName = addSlashLeft(nspName)
+        let _nsp = this._nsps.get(nspName)
+        if (!_nsp) {
+            logger.error(__filename, 365, "could not find nsp by nspName=", nspName)
+        }
+        this._sm.queryByUserId(userId, nspName)
+            .then((v: ISession | Error) => {
+                if (v instanceof Error) {
+                    logger.error(__filename, 371, `could not find session by userId=${userId}, err=${v}`)
+                    return
+                }
+
+                let _socket = this._sockets.get(v.socketId)
+                if (!_socket) { logger.error(`could not get socket by socketId=${v.socketId}`); return }
+                _socket.getSocket().disconnect(true)
+            })
+    }
+
+
+    /**
+     * knockoutFromRoom
+     * force client for be disconnected
+     */
+    knockoutFromRoom = (nspName: string, roomId: string, userId: number) => {
+        nspName = addSlashLeft(nspName)
+        let _nsp = this._nsps.get(nspName)
+        if (!_nsp) {
+            logger.error("could not find nsp by nspName=", nspName)
+        }
+        this._sm.queryByUserId(userId, nspName)
+            .then((v: ISession | Error) => {
+                if (v instanceof Error) {
+                    logger.error(__filename, 395, `could not find session by userId=${userId}, err=${v}`)
+                    return
+                }
+
+                let _socket = this._sockets.get(v.socketId)
+                if (!_socket) { logger.error(`could not get socket by socketId=${v.socketId}`); return }
+                _socket.getSocket().leave(roomId)
+            })
+    }
+
+    /**
+     * clearRooms
+     * remove all clients' socket from room
+     */
+    clearRooms = (nspName: string, roomIds: string[]) => {
+        nspName = addSlashLeft(nspName)
+        const _nsp = this._nsps.get(nspName)
+        if (!_nsp) { logger.error(`could not find nsp by nspName=${nspName}`); return }
+
+        roomIds.forEach((roomId: string) => {
+            logger.info("clear room with roomId=", roomId)
+            _nsp.in(roomId).clients((err: Error, socketIds: string[]) => {
+                if (err) { logger.error("loop client get error: ", err, socketIds); return }
+                socketIds.forEach((socketId: string) => {
+                    let _socket = this._sockets.get(socketId)
+                    if (!_socket) { logger.error("could not get socket by socketId=", socketId); return }
+                    _socket.getSocket().emit("logic/error", new Error(`you are removed from room=${roomId}`))
+                    _socket.getSocket().leave(roomId, (err: Error) => {
+                        if (err) { logger.error(`socketId=${socketId} could not leave roomId=${roomId} with err=${err}`); return }
+                        logger.info(`socketId=${socketId} has leaved room roomId=${roomId}`)
+                    })
+                })
+            })
+        })
+    }
     /**
      * TODO: add mroe nsp info
      */

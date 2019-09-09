@@ -7,5 +7,5 @@ export { Config }
 import { Des, DesAlgorithm } from './des'
 export { Des, DesAlgorithm }
 // import { redisClient, initialRedis } from './ins'
-import { getNowTimestamp } from './lib'
-export { getNowTimestamp }
+import { getNowTimestamp, rmSlashLeft, addSlashLeft } from './lib'
+export { getNowTimestamp, rmSlashLeft, addSlashLeft }

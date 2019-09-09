@@ -5,8 +5,13 @@ import { logger } from '../utils/ins'
 import { SocketioWrapper } from "./socketio";
 import { proto, GrpcServerOptions, codes, getMessage } from "../types";
 
+// let logger = logger('grpc.ts')
 
 class gRPCService {
+    /**
+     * TODO: based redis PUB/SUB to support command dispensing
+     */
+
     port: number
     _socketioSrv: SocketioWrapper
     // _srv: grpc.Server
@@ -26,8 +31,9 @@ class gRPCService {
             nspBroadcast: this.nspBroadcast,
             nspRoomsBroadcast: this.nspRoomsBroadcast,
             nspUsersBroadcast: this.nspUsersBroadcast,
-            deactive: this.deactive,
-            clearRoom: this.clearRoom,
+            disconnect: this.disconnect,
+            knockoutFromRoom: this.knockoutFromRoom,
+            clearRooms: this.clearRooms,
         })
         _srv.bind("0.0.0.0:" + this.port.toString(), grpc.ServerCredentials.createInsecure())
         _srv.start()
@@ -37,7 +43,10 @@ class gRPCService {
         let msg = call.request.getMsg()
         let resp = new api_pb.NspBroadcastResp()
         if (!msg) {
-            cb(new Error("empty message"), resp)
+            let err = new Error("invalid message format")
+            resp.setErrcode(codes.ParamInvalid)
+            resp.setErrmsg(err.message)
+            cb(null, resp)
             return
         }
         logger.info("broadcast message: ", msg, msg.getId(), msg.getVer());
@@ -52,14 +61,17 @@ class gRPCService {
         let nspName = call.request.getNspname()
         let resp = new api_pb.NspBroadcastResp()
         if (!msgs.length || !nspName) {
-            cb(new Error("invalid message format"), resp)
+            let err = new Error("invalid message format")
+            resp.setErrcode(codes.ParamInvalid)
+            resp.setErrmsg(err.message)
+            cb(null, resp)
             return
         }
 
         // fill _msg.getMsg() into RoomsMessage
         let newMsgs = msgs.map((msg: api_pb.RoomMessage): proto.IRoomsMessage => {
             // if (!_msg) return null
-            return new proto.RoomsMessage(msg.getRoomid(),
+            return new proto.RoomsMessage(nspName, msg.getRoomid(),
                 new proto.Message().loadFromPb(msg.getMsg()))
         })
 
@@ -67,32 +79,74 @@ class gRPCService {
     }
 
     nspUsersBroadcast = (call: grpc.ServerUnaryCall<api_pb.NspUsersBroadcastReq>, cb: grpc.requestCallback<api_pb.NspUsersBroadcastResp>) => {
+        logger.info("recv rpc request: ", call.request)
         let msgs = call.request.getMsgsList()
         let nspName = call.request.getNspname()
-        let resp = new api_pb.NspBroadcastResp()
+        let resp = new api_pb.NspUsersBroadcastResp()
         if (!msgs.length || !nspName) {
-            cb(new Error("invalid message format"), resp)
+            let err = new Error("invalid message format")
+            resp.setErrcode(codes.ParamInvalid)
+            resp.setErrmsg(err.message)
+            cb(null, resp)
             return
         }
 
         // fill _msg.getMsg() into UsersMessage
         let newMsgs = msgs.map((msg: api_pb.UserMessage) => {
-            return new proto.UsersMessage(msg.getUserid(),
+            return new proto.UsersMessage(nspName, msg.getUserid(),
                 new proto.Message().loadFromPb(msg.getMsg()))
         })
 
         this._socketioSrv.broadcastUsers(nspName, newMsgs)
-    }
-
-    deactive = (call: grpc.ServerUnaryCall<api_pb.DeactiveReq>, cb: grpc.requestCallback<api_pb.DeactiveResp>) => {
-        // TODO:
-        let resp = new api_pb.NspBroadcastResp()
+        resp.setErrcode(codes.OK)
+        resp.setErrmsg(getMessage(codes.OK))
         cb(null, resp)
     }
 
-    clearRoom = (call: grpc.ServerUnaryCall<api_pb.ClearRoomReq>, cb: grpc.requestCallback<api_pb.ClearRoomResp>) => {
-        // TODO:
-        let resp = new api_pb.NspBroadcastResp()
+    /**
+     * disconnect
+     * server-side disconnect with client
+     */
+    disconnect = (call: grpc.ServerUnaryCall<api_pb.DisconnectReq>, cb: grpc.requestCallback<api_pb.DisconnectResp>) => {
+        let nspName = call.request.getNspname()
+        let userId = call.request.getUserid()
+        let resp = new api_pb.DisconnectResp()
+
+        this._socketioSrv.deactiveByUserId(nspName, userId)
+        resp.setErrcode(codes.OK)
+        resp.setErrmsg(getMessage(codes.OK))
+        cb(null, resp)
+    }
+
+    /**
+     * deactiveFromRoom 
+     * support multi
+     */
+    knockoutFromRoom = (call: grpc.ServerUnaryCall<api_pb.KnockoutReq>, cb: grpc.requestCallback<api_pb.KnockoutResp>) => {
+        let nspName = call.request.getNspname()
+        let metas = call.request.getMetasList()
+        let resp = new api_pb.KnockoutResp()
+
+        metas.forEach((meta: api_pb.KnockoutMeta) => {
+            this._socketioSrv.knockoutFromRoom(nspName, meta.getRoomid(), meta.getUserid())
+        })
+
+        resp.setErrcode(codes.OK)
+        resp.setErrmsg(getMessage(codes.OK))
+        cb(null, resp)
+    }
+
+    /**
+     * clearRoom
+     */
+    clearRooms = (call: grpc.ServerUnaryCall<api_pb.ClearRoomsReq>, cb: grpc.requestCallback<api_pb.ClearRoomsResp>) => {
+        let roomIds = call.request.getRoomidsList()
+        let nspName = call.request.getNspname()
+        let resp = new api_pb.ClearRoomsResp()
+
+        this._socketioSrv.clearRooms(nspName, roomIds)
+        resp.setErrcode(codes.OK)
+        resp.setErrmsg(getMessage(codes.OK))
         cb(null, resp)
     }
 

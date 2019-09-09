@@ -40,6 +40,7 @@ export class Session implements ISession {
     }
 
     unmarshal(d: string): ISession {
+        // console.log("unmarshal session form: ", d);
         try {
             let { userId, socketId, clientIp, token, nsp, meta } = JSON.parse(d)
             this.userId = userId

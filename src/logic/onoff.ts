@@ -83,7 +83,7 @@ class OnoffEmitterBasedRedis implements IOnoffEmitter {
     }
 
     /**
-     * 
+     * off means offline
      * @param nspName 
      * @param data 
      */
@@ -101,7 +101,7 @@ class OnoffEmitterBasedRedis implements IOnoffEmitter {
     }
 
     /**
-     * 
+     * on means online
      * @param nspName 
      * @param data 
      */

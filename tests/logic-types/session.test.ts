@@ -4,7 +4,7 @@ import { RedisClient } from 'redis'
 import { AuthReq, IAuthReq, Session } from '../../src/types'
 import assert from 'assert'
 import { describe, it, suiteSetup } from 'mocha'
-import { configureLogger } from '../../src/utils/logger'
+import { configureLogger } from '../../src/utils/ins'
 import path from 'path'
 
 suiteSetup(() => {

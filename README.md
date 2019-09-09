@@ -4,7 +4,7 @@ socket.io-based realtime app
 ### Features
 
 * [x] HTTP Monitor API, monitor nodes, nsp, users stats
-* [x] gRPC Manage API, support server manage self-defined evt
+* [x] gRPC Manage API, support server manage self-defined evt. !!!!only support sigle node yet.
 * [x] based socket.io, it's stable
 * [x] `node.js` event driven
 
@@ -13,11 +13,13 @@ socket.io-based realtime app
 * [x] create examples
 * [x] import unittest frame `mocha` and write
 * [x] plugin session manager
-* [ ] fill gRPC server functions
-* [ ] fill http monitor handlers
-* [ ] fill all TODOs have been marked
-* [ ] import `redis-adapter`
+* [x] fill gRPC server functions
+* [ ] support nsp config with Database
+* [ ] fill http monitor handlers with class `logic/Monitor`
 * [ ] slim client lib output, resolve lib dependecy relationship, event into one file
+* [ ] import and use `redis-adapter`
+* [ ] RPC support multi-node, plan: based on `redis` and `middleware` pattern
+* [ ] fill API docs
 
 ### Dependencies
 
@@ -33,3 +35,4 @@ socket.io-based realtime app
 |Architecture|[docs/arch](docs/arch.md)|
 |Proto Defination|[docs/proto](docs/proto.md)|
 |SocketIO Event|[docs/socketio](docs/socketio.md)|
+|API|[docs/api](docs/api.md)|

@@ -3,8 +3,7 @@ const readline = require('readline')
 
 const main = () => {
     let client = new lib.Client(
-        "http://localhost:3000/demo",
-        { path: "/socket.io" },
+        { host: "http://localhost:3000", nspName: "demo", path: "/socket.io", },
         [
             {
                 evt: 'disconnect',
@@ -40,7 +39,7 @@ const main = () => {
     let userId = 10;
 
     rl.question("what's your userId ?\n", function (answer) {
-        userId = answer
+        userId = parseInt(answer, 10)
         client.auth(userId, { meta: "foobar" }, function (data) {
             console.log("auth evt: ", data);
         })

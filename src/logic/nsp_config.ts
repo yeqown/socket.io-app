@@ -43,7 +43,7 @@ export class NspConfigRepo implements INspConfiger {
      */
     allNsp(): INspConfig[] {
         let nspCfgs = new Array<NspConfig>()
-        nspCfgs.push(new NspConfig("demo", ["chat", "ban"]))
+        nspCfgs.push(new NspConfig("/demo", ["chat", "ban"]))
         return nspCfgs
     }
 
