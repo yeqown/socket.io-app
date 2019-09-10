@@ -14,11 +14,11 @@ socket.io-based realtime app
 * [x] import unittest frame `mocha` and write
 * [x] plugin session manager
 * [x] fill gRPC server functions
-* [ ] support nsp config with Database
+* [x] support nsp config with Database
 * [ ] fill http monitor handlers with class `logic/Monitor`
-* [ ] slim client lib output, resolve lib dependecy relationship, event into one file
+* [ ] slim client lib output, resolving lib dependecy relationship, event into one file
 * [ ] import and use `redis-adapter`
-* [ ] RPC support multi-node, plan: based on `redis` and `middleware` pattern
+* [ ] RPC support multi-node also to synchronize nspConfig, plan is: based on `redis` and `middleware` pattern
 * [ ] fill API docs
 
 ### Dependencies
