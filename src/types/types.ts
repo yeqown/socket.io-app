@@ -1,3 +1,5 @@
+import { codes, getMessage } from "../utils"
+
 export interface ISession {
     userId: number,
     socketId: string,
@@ -112,3 +114,36 @@ export interface Err {
     errMsg: string,
 }
 
+
+export class ApiResponse {
+    errcode: number
+    errmsg: string
+    data: any
+
+    constructor(errcode?: number, errmsg?: string, data?: any) {
+        this.errcode = errcode || codes.OK
+        this.errmsg = errmsg || getMessage(this.errcode)
+        if (!data) {
+            this.data == null
+        } else {
+            this.data = data
+        }
+    }
+
+    setErrcode(errcode: number, errmsg?: string) {
+        this.errcode = errcode
+        if (errmsg) {
+            this.errmsg = errmsg
+        } else {
+            this.errmsg = getMessage(errcode)
+        }
+    }
+
+    setData(d: any) {
+        if (!d) {
+            this.data == null
+        } else {
+            this.data = d
+        }
+    }
+}

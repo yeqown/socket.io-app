@@ -5,14 +5,21 @@
         "db": 1
     },
     "mongo": {
-        "addr": "127.0.0.1",
+        "host": "127.0.0.1",
         "port": 27017,
-        "username": "",
-        "password": ""
+        "mgoClientOpt": {
+            "poolSize": 20,
+            "useNewUrlParser": true,
+            "useUnifiedTopology": true
+        }
     },
     "socketio": {
         "port": 3000,
-        "path": "/socket.io"
+        "path": "/socket.io",
+        "nspConfigOpt": {
+            "db": "socketio-app",
+            "coll": "nsp_configs"
+        }
     },
     "grpc": {
         "port": 3001

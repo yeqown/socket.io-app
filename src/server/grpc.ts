@@ -52,7 +52,6 @@ class gRPCService {
         logger.info("broadcast message: ", msg, msg.getId(), msg.getVer());
         resp.setErrcode(codes.OK)
         resp.setErrmsg(getMessage(codes.OK))
-        logger.info("resp is: ", resp.getErrcode(), resp.getErrmsg());
         cb(null, resp)
     }
 
@@ -76,6 +75,9 @@ class gRPCService {
         })
 
         this._socketioSrv.broadcastRooms(nspName, newMsgs)
+        resp.setErrcode(codes.OK)
+        resp.setErrmsg(getMessage(codes.OK))
+        cb(null, resp)
     }
 
     nspUsersBroadcast = (call: grpc.ServerUnaryCall<api_pb.NspUsersBroadcastReq>, cb: grpc.requestCallback<api_pb.NspUsersBroadcastResp>) => {

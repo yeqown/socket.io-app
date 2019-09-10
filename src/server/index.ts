@@ -4,9 +4,9 @@ import { SocketioWrapper } from './socketio'
 import { RedisClient } from 'redis'
 import { GrpcServerOptions, SocketioOptions } from '../types'
 
-function initialSocketio(opt: SocketioOptions, rc: RedisClient): SocketioWrapper {
+function initialSocketio(opt: SocketioOptions): SocketioWrapper {
     // let opt: Options = { port: 3000 }
-    let s = new SocketioWrapper(opt, rc)
+    let s = new SocketioWrapper(opt)
     // open server
     // s.serve()
     return s

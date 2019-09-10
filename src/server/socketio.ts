@@ -4,15 +4,15 @@ import io from 'socket.io'
 import express from 'express'
 import { Request, Response } from "express";
 import http from 'http'
-import { RedisClient } from 'redis'
+// import { RedisClient } from 'redis'
 
-import { proto, IJoinRoomsReq, AuthReq, IAuthReq, SocketioOptions, ISession } from '../types'
+import { proto, IJoinRoomsReq, AuthReq, IAuthReq, SocketioOptions, ISession, ApiResponse } from '../types'
 import { codes, getMessage, addSlashLeft } from '../utils'
-import { logger } from '../utils/ins'
+import { logger, mgoClient, redisClient } from '../utils/ins'
 import {
     ISessionManager, IOnoffEmitter,
     SManagerBasedRedis, OnoffEmitterBasedRedis, OnoffMsg, EventType, ITokenr, DesTokenr,
-    INspConfiger, INspConfig, NspConfigRepo,
+    INspConfiger, INspConfig, NspConfigRepo, NspConfig,
 } from '../logic'
 
 
@@ -73,13 +73,13 @@ class SocketioWrapper {
     // and not trigger online or offline evt
     _sockets: Map<string, SocketWrapper>
 
-    constructor(opt: SocketioOptions, rc: RedisClient) {
+    constructor(opt: SocketioOptions) {
         logger.info("socketio-wrapper initializing with opts: ", opt);
         this.port = opt.port || 3000
 
-        this._sm = new SManagerBasedRedis(rc)
-        this._nspConfiger = new NspConfigRepo(rc)
-        this._onoffEmitter = new OnoffEmitterBasedRedis(rc)
+        this._sm = new SManagerBasedRedis(redisClient)
+        this._nspConfiger = new NspConfigRepo(mgoClient, opt.nspConfigOpt)
+        this._onoffEmitter = new OnoffEmitterBasedRedis(redisClient)
         this._auth = new DesTokenr()
 
         this._nsps = new Map<string, io.Namespace>()
@@ -87,6 +87,7 @@ class SocketioWrapper {
 
         // create socketio server
         this._app = express()
+        this._app.use(express.urlencoded())
         this._httpSrv = http.createServer(this._app)
         this._io = io(this._httpSrv, {
             path: opt.path,
@@ -108,45 +109,46 @@ class SocketioWrapper {
         })
     }
 
-    /**
-     * creata an Nsp and listen evt on it
-     */
-    createNsp = (nspCfg: INspConfig): Error | null => {
-        let _nsp = this._nsps.get(nspCfg.name)
-        if (_nsp === undefined) {
-            let err = new Error("duplicate nsp name")
-            logger.error("could not create a Nsp with error:", err)
-            return err
-        }
+    // /**
+    //  * creata an Nsp and listen evt on it
+    //  */
+    // createNsp = (nspCfg: INspConfig): Error | null => {
+    //     let _nsp = this._nsps.get(nspCfg.name)
+    //     if (_nsp === undefined) {
 
-        try {
-            this._nspConfiger.applyFor(nspCfg)
-        } catch (err) {
-            logger.error("coule not apply for a Nsp with error: ", err)
-            return err
-        }
+    //         let err = new Error("duplicate nsp name")
+    //         logger.error("could not create a Nsp with error:", err)
+    //         return err
+    //     }
 
-        return null
-    }
+    //     try {
+    //         this._nspConfiger.applyFor(nspCfg)
+    //     } catch (err) {
+    //         logger.error("coule not apply for a Nsp with error: ", err)
+    //         return err
+    //     }
 
-    /**
-     * rmeove an Nsp [Nsp event & Nsp]
-     * @param nspName
-     */
-    removeNsp = (nspName: string): Error | null => {
-        nspName = addSlashLeft(nspName)
-        let _nsp = this._nsps.get(nspName)
-        if (_nsp === undefined) {
-            let err = new Error("undefined nsp")
-            return err
-        }
+    //     return null
+    // }
 
-        _nsp.removeAllListeners()
-        this._nsps.delete(nspName)
-        delete this._io.nsps[nspName]
+    // /**
+    //  * rmeove an Nsp [Nsp event & Nsp]
+    //  * @param nspName
+    //  */
+    // removeNsp = (nspName: string): Error | null => {
+    //     nspName = addSlashLeft(nspName)
+    //     let _nsp = this._nsps.get(nspName)
+    //     if (_nsp === undefined) {
+    //         let err = new Error("undefined nsp")
+    //         return err
+    //     }
 
-        return null
-    }
+    //     _nsp.removeAllListeners()
+    //     this._nsps.delete(nspName)
+    //     delete this._io.nsps[nspName]
+
+    //     return null
+    // }
 
 
     private _authed(socketId: string): boolean {
@@ -158,42 +160,31 @@ class SocketioWrapper {
      * register nsp into socket.io also handlers to evts includes built-in and custom
      */
     private _mountNsps = () => {
-        let nspCfgs = this._nspConfiger.allNsp()
-        nspCfgs.forEach((cfg: INspConfig) => {
-            let nspName = addSlashLeft(cfg.name)
-            if (this._nsps.get(nspName)) {
-                logger.error("duplicate nsp name config: ", nspName)
-                return
-            }
+        this._nspConfiger.allNsp((err: Error | null, nspCfgs: INspConfig[]) => {
+            nspCfgs.forEach((cfg: INspConfig) => {
+                let nspName = addSlashLeft(cfg.name)
+                if (this._nsps.get(nspName)) {
+                    logger.error("duplicate nsp name config: ", nspName)
+                    return
+                }
+                // register handlers
+                logger.info("generate nsp name: ", nspName, "evts:", cfg.listenEvts)
+                let _nsp = this._io.of(nspName)
 
-            // register handlers
-            logger.info("generate nsp name: ", nspName, "evts:", cfg.listenEvts)
-            let _nsp = this._io.of(nspName)
+                // TODO: using middleware
 
-            // TODO: using middleware
-            // _nsp.use((socket: io.Socket, next: (err?: any) => void): void => {
-            //     next()
-            // })
+                // handle connection to socket
+                _nsp.on("connection", (socket: io.Socket) => {
+                    logger.info("a new socket incomming, and it's socketId is: %s, nspName: %s",
+                        socket.id, socket.nsp.name)
+                    this._hdlSocketConn(_nsp, socket, cfg)
+                })
 
-            _nsp.on("connection", (socket: io.Socket) => {
-                logger.info("a new socket incomming, and it's socketId is: %s, nspName: %s",
-                    socket.id, socket.nsp.name)
-                this._hdlSocketConn(_nsp, socket, cfg)
+                // record nsp
+                this._nsps.set(nspName, _nsp)
             })
-
-            // record nsp
-            this._nsps.set(nspName, _nsp)
         })
-
-        // TODO:
-        // refused all connection to root Nsp
-        // this._io.of(new RegExp("^\/$")).on("connection", (socket: io.Socket) => {
-        //     if (socket.connected) {
-        //         logger.error("connection refused: could not use root nsp, nspName is: ", socket.nsp.name)
-        //         socket.emit(_logicErrorEvt, new Error("connection refused"))
-        //     }
-        //     socket.disconnect()
-        // })
+        // TODO: refused all connection to root Nsp
     }
 
     /**
@@ -301,11 +292,13 @@ class SocketioWrapper {
     }
 
     /**
-     * 
+     * _mountHandlers, register handler to `app` typeof `express`
      */
     private _mountHandlers = () => {
         this._app.get("/api/nsps/all", this.hdlGetAllNsps)
         this._app.get("/api/nsps/:nspName", this.hdlGetNsp)
+        this._app.post("/api/nsps/gen", this.hdlGenNsp)
+        this._app.delete("/api/nsps/:nspName", this.hdlRemoveNsp)
     }
 
     /**
@@ -428,13 +421,23 @@ class SocketioWrapper {
             })
         })
     }
+
     /**
      * TODO: add mroe nsp info
      */
     hdlGetAllNsps = (req: Request, resp: Response) => {
-        let r = JSON.stringify(this._nspConfiger.allNsp())
-        resp.write(r)
-        resp.end()
+        let r = new ApiResponse()
+
+        this._nspConfiger.allNsp((err: Error | null, cfgs: INspConfig[]) => {
+            if (err) {
+                r.setErrcode(codes.ServerErr, err.message)
+                resp.json() && resp.end()
+                return
+            }
+            r.setErrcode(codes.OK)
+            r.setData(cfgs)
+            resp.json(r) && resp.end()
+        })
     }
 
     /**
@@ -442,13 +445,75 @@ class SocketioWrapper {
      * TODO: add nsp monitor data
      */
     hdlGetNsp = (req: Request, resp: Response) => {
+        let r = new ApiResponse()
         let { nspName } = req.params
         // logger.info(req.path)
-        let nsps = this._nspConfiger.allNsp().filter((cfg: INspConfig) => {
-            return nspName === cfg.name
+        this._nspConfiger
+            .allNsp((err: Error | null, cfgs: INspConfig[]) => {
+                if (err) {
+                    r.setErrcode(codes.ServerErr)
+                    resp.json() && resp.end()
+                    return
+                }
+
+                let nsps = cfgs.filter((cfg: INspConfig) => {
+                    return nspName === cfg.name
+                })
+
+                r.setErrcode(codes.OK)
+                r.setData(nsps)
+                resp.json(r) && resp.end()
+            })
+    }
+
+    /**
+     * hdlGenNsp generate an Nsp with config
+     * TODO: multi node to sync the nsp config, for now, you have to restart server manually
+     */
+    hdlGenNsp = (req: Request, resp: Response) => {
+        logger.info(req.body)
+        let r = new ApiResponse()
+        let { nspName = '', evts } = req.body
+        if (nspName === '') {
+            r.setErrcode(codes.ParamInvalid, "nspName could not be empty")
+            resp.json(r) && resp.end()
+            return
+        }
+
+        if (typeof evts !== 'string' && !Array.isArray(evts)) {
+            r.setErrcode(codes.ParamInvalid, "evts type incorrect")
+            resp.json(r) && resp.end()
+            return
+        }
+
+        if (typeof evts === 'string') {
+            evts = [evts]
+        }
+
+        let cfg = new NspConfig(nspName, evts)
+        this._nspConfiger.applyFor(cfg, (err: Error | null) => {
+            if (err) {
+                r.setErrcode(codes.ServerErr, err.message)
+                resp.json(r) && resp.end()
+                return
+            }
+            r.setErrcode(codes.OK)
+            resp.json(r) && resp.end()
+            return
         })
-        resp.write(JSON.stringify(nsps))
+
+    }
+
+    /**
+     * hdlRemoveNsp
+     * remove nsp config from nspConfiger
+     * TODO: multi node to sync nsp config
+     */
+    hdlRemoveNsp = (req: Request, resp: Response) => {
+        let { nspName } = req.params
+        resp.json("nspName")
         resp.end()
+        return
     }
 }
 
