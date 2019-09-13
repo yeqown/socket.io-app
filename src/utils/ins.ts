@@ -49,9 +49,9 @@ const configureLogger = (conf: string): Logger | null => {
     try {
         log4js.configure(conf)
         if (NODE_ENV && NODE_ENV === 'dev') {
-            logger = log4js.getLogger("default")
+            logger = log4js.getLogger("dev")
         } else {
-            logger = log4js.getLogger("file")
+            logger = log4js.getLogger("prod")
         }
         return logger
     } catch (err) {

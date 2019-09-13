@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:dc="http://purl.org/dc/elements/1.1/" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xl="http://www.w3.org/1999/xlink" viewBox="-1480.5 1617.5 1202 833" width="1202" height="833">
+  <defs>
+    <filter id="Shadow" filterUnits="userSpaceOnUse" x="-1480.5" y="1617.5">
+      <feGaussianBlur in="SourceAlpha" result="blur" stdDeviation="1.3030978"/>
+      <feOffset in="blur" result="offset" dx="0" dy="2"/>
+      <feFlood flood-color="black" flood-opacity=".2" result="flood"/>
+      <feComposite in="flood" in2="offset" operator="in" result="color"/>
+      <feMerge>
+        <feMergeNode in="color"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <font-face font-family="Helvetica" font-size="12" units-per-em="1000" underline-position="-75.68359" underline-thickness="49.316406" slope="0" x-height="522.9492" cap-height="717.28516" ascent="770.0195" descent="-229.98047" font-weight="400">
+      <font-face-src>
+        <font-face-name name="Helvetica"/>
+      </font-face-src>
+    </font-face>
+    <font-face font-family="Helvetica Neue" font-size="16" panose-1="2 0 5 3 0 0 0 2 0 4" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="0" x-height="517" cap-height="714" ascent="951.9958" descent="-212.99744" font-weight="400">
+      <font-face-src>
+        <font-face-name name="HelveticaNeue"/>
+      </font-face-src>
+    </font-face>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -4 10 8" markerWidth="10" markerHeight="8" color="black">
+      <g>
+        <path d="M 8 0 L 0 -3 L 0 3 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker_2" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -4 10 8" markerWidth="10" markerHeight="8" color="black">
+      <g>
+        <path d="M 8 0 L 0 -3 L 0 3 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+    <font-face font-family="PingFang SC" font-size="19" panose-1="2 11 4 0 0 0 0 0 0 0" units-per-em="1000" underline-position="-150" underline-thickness="58" slope="0" x-height="600" cap-height="860" ascent="1060.0021" descent="-340.0007" font-weight="400">
+      <font-face-src>
+        <font-face-name name="PingFangSC-Regular"/>
+      </font-face-src>
+    </font-face>
+    <font-face font-family="PingFang SC" font-size="12" panose-1="2 11 4 0 0 0 0 0 0 0" units-per-em="1000" underline-position="-150" underline-thickness="58" slope="0" x-height="600" cap-height="860" ascent="1060.0021" descent="-340.0007" font-weight="400">
+      <font-face-src>
+        <font-face-name name="PingFangSC-Regular"/>
+      </font-face-src>
+    </font-face>
+    <font-face font-family="Helvetica Neue" font-size="12" panose-1="2 0 5 3 0 0 0 2 0 4" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="0" x-height="517" cap-height="714" ascent="951.9958" descent="-212.99744" font-weight="400">
+      <font-face-src>
+        <font-face-name name="HelveticaNeue"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <metadata> Produced by OmniGraffle 7.11.2 
+    <dc:date>2019-09-12 01:58:09 +0000</dc:date>
+  </metadata>
+  <g id="版面__" stroke="none" fill="none" stroke-opacity="1" stroke-dasharray="none" fill-opacity="1">
+    <title>数据流</title>
+    <g id="版面__: multi-gRPC-node2-plan2">
+      <title>multi-gRPC-node2-plan2</title>
+      <g id="Graphic_437" filter="url(#Shadow)">
+        <path d="M -1418 1800 L -1360.9366 1841.459 L -1382.7328 1908.541 L -1453.2672 1908.541 L -1475.0634 1841.459 Z" fill="#c0ffff"/>
+        <path d="M -1418 1800 L -1360.9366 1841.459 L -1382.7328 1908.541 L -1453.2672 1908.541 L -1475.0634 1841.459 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-1473 1853)" fill="black">
+          <tspan font-family="Helvetica" font-size="12" font-weight="400" fill="black" x="26.32715" y="11">RPC-client</tspan>
+        </text>
+      </g>
+      <g id="Graphic_439">
+        <rect x="-1250" y="1821.5" width="160" height="77.00001" fill="#ffff80"/>
+        <rect x="-1250" y="1821.5" width="160" height="77.00001" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-1245 1823.328)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="black" x="26.264" y="15">gRPC-server-</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="black" x="48.032" y="33.448">Master:</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="#b34400" x="34.096" y="69.896">SrvId: 0001</tspan>
+        </text>
+      </g>
+      <g id="Graphic_443">
+        <rect x="-803" y="1618" width="160" height="77.00001" fill="#ffff80"/>
+        <rect x="-803" y="1618" width="160" height="77.00001" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-798 1629.052)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="black" x=".184" y="15">gRPC-server-Node1:</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="#b34400" x="34.096" y="51.448">SrvId: 0001</tspan>
+        </text>
+      </g>
+      <g id="Graphic_442">
+        <rect x="-803" y="1758" width="160" height="77.00001" fill="#ffff80"/>
+        <rect x="-803" y="1758" width="160" height="77.00001" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-798 1769.052)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="black" x=".184" y="15">gRPC-server-Node2:</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="#b1001c" x="31.872" y="51.448">Srved: 0002</tspan>
+        </text>
+      </g>
+      <g id="Graphic_441">
+        <rect x="-803" y="1898" width="160" height="77.00001" fill="#ffff80"/>
+        <rect x="-803" y="1898" width="160" height="77.00001" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-798 1909.052)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="black" x=".184" y="15">gRPC-server-Node3:</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="#b1001c" x="34.096" y="51.448">SrvId: 0003</tspan>
+        </text>
+      </g>
+      <g id="Graphic_440">
+        <rect x="-803" y="2053" width="160" height="77.00001" fill="#ffff80"/>
+        <rect x="-803" y="2053" width="160" height="77.00001" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-798 2054.828)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="black" x="26.264" y="15">gRPC-server-</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="black" x="47.592" y="33.448">NodeN:</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="#b1001c" x="26.56" y="69.896">SrvId: XXXXN</tspan>
+        </text>
+      </g>
+      <g id="Graphic_444">
+        <path d="M -472.9275 1812.847 C -508.96875 1806.4017 -494.5964 1752.1437 -437.10254 1761.4017 C -431.7684 1743.355 -364.91075 1746.2841 -365.34783 1761.4017 C -323.42606 1742.0661 -269.85254 1780.621 -305.78676 1799.9565 C -262.66748 1809.331 -306.33088 1859.839 -341.71875 1851.4017 C -344.55085 1865.4645 -407.8137 1870.3857 -413.3664 1851.4017 C -449.18914 1871.6757 -523.8852 1840.5033 -472.9275 1812.847 Z" fill="#c0ffff"/>
+        <path d="M -472.9275 1812.847 C -508.96875 1806.4017 -494.5964 1752.1437 -437.10254 1761.4017 C -431.7684 1743.355 -364.91075 1746.2841 -365.34783 1761.4017 C -323.42606 1742.0661 -269.85254 1780.621 -305.78676 1799.9565 C -262.66748 1809.331 -306.33088 1859.839 -341.71875 1851.4017 C -344.55085 1865.4645 -407.8137 1870.3857 -413.3664 1851.4017 C -449.18914 1871.6757 -523.8852 1840.5033 -472.9275 1812.847 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-463.55 1778.9537)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="black" x="43.722003" y="15">Registry</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" font-weight="400" fill="black" x=".0020030518" y="51.448">srvID: srvAddr, other </tspan>
+        </text>
+      </g>
+      <g id="Line_445">
+        <line x1="-643" y1="1692.5666" x2="-486.2099" y2="1763.2526" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_446">
+        <line x1="-643" y1="1798.8824" x2="-498.94434" y2="1803.1723" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_447">
+        <line x1="-643" y1="1905.1982" x2="-494.32197" y2="1847.0245" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_448">
+        <line x1="-678.0988" y1="2053" x2="-457.5332" y2="1863.8785" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_452">
+        <path d="M -1156.7654 1898.5 C -1120.2431 1997.1133 -1008.6069 2250.86 -827.7778 2247.7778 C -616.76895 2244.181 -514.4162 2003.0516 -399.9359 1870.3323" marker-end="url(#FilledArrow_Marker_2)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="16.0,9.0" stroke-width="1"/>
+      </g>
+      <g id="Graphic_453">
+        <rect x="-890" y="2224.75" width="154.894" height="36" fill="white"/>
+        <text transform="translate(-885 2229.75)" fill="black">
+          <tspan font-family="PingFang SC" font-size="19" font-weight="400" fill="black" x="11368684e-20" y="20">Query with srvID</tspan>
+        </text>
+      </g>
+      <g id="Line_454">
+        <line x1="-1090" y1="1823.5794" x2="-812.0102" y2="1697.0225" marker-end="url(#FilledArrow_Marker_2)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_455">
+        <line x1="-1090" y1="1848.6353" x2="-812.8016" y2="1809.257" marker-end="url(#FilledArrow_Marker_2)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_456">
+        <line x1="-1090" y1="1873.6913" x2="-812.7581" y2="1921.1387" marker-end="url(#FilledArrow_Marker_2)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_457">
+        <line x1="-1095.6609" y1="1898.5" x2="-806.1301" y2="2048.4472" marker-end="url(#FilledArrow_Marker_2)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_458">
+        <rect x="-603.6622" y="1713.4257" width="69.748" height="27" fill="white"/>
+        <text transform="translate(-598.6622 1718.4257)" fill="black">
+          <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="black" x="6.7260005" y="13">Register</tspan>
+        </text>
+      </g>
+      <g id="Graphic_459">
+        <rect x="-596.3337" y="1860.5743" width="69.748" height="27" fill="white"/>
+        <text transform="translate(-591.3337 1865.5743)" fill="black">
+          <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="black" x="6.7260005" y="13">Register</tspan>
+        </text>
+      </g>
+      <g id="Graphic_460">
+        <rect x="-603.6622" y="1787" width="69.748" height="27" fill="white"/>
+        <text transform="translate(-598.6622 1792)" fill="black">
+          <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="black" x="6.7260005" y="13">Register</tspan>
+        </text>
+      </g>
+      <g id="Graphic_461">
+        <rect x="-582" y="1934.1487" width="69.748" height="27" fill="white"/>
+        <text transform="translate(-577 1939.1487)" fill="black">
+          <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="black" x="6.7260005" y="13">Register</tspan>
+        </text>
+      </g>
+      <g id="Line_462">
+        <line x1="-1366.961" y1="1860" x2="-1250" y2="1860" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_463">
+        <rect x="-1338.005" y="1846.5" width="28.072" height="27" fill="white"/>
+        <text transform="translate(-1334.871 1851.5)" fill="black">
+          <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="black" x="42632564e-21" y="13">Req</tspan>
+        </text>
+      </g>
+      <g id="Graphic_464">
+        <rect x="-975.1281" y="1746.4017" width="50" height="27" fill="white"/>
+        <text transform="translate(-970.1281 1751.4017)" fill="black">
+          <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="black" x="6.692" y="13">Req1</tspan>
+        </text>
+      </g>
+      <g id="Graphic_465">
+        <rect x="-977.7772" y="1815.5707" width="51" height="27" fill="white"/>
+        <text transform="translate(-972.7772 1820.5707)" fill="black">
+          <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="black" x="5.998" y="13">Req2</tspan>
+        </text>
+      </g>
+      <g id="Graphic_466">
+        <rect x="-974.9809" y="1884.1543" width="50" height="27" fill="white"/>
+        <text transform="translate(-969.9809 1889.1543)" fill="black">
+          <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="black" x="5.498" y="13">Req3</tspan>
+        </text>
+      </g>
+      <g id="Graphic_467">
+        <rect x="-973.6352" y="1961.4031" width="51" height="27" fill="white"/>
+        <text transform="translate(-968.6352 1966.4031)" fill="black">
+          <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="black" x="5.998" y="13">Req4</tspan>
+        </text>
+      </g>
+      <g id="Graphic_468">
+        <text transform="translate(-1435 2369)" fill="black">
+          <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="black" x="0" y="13">优点：</tspan>
+          <tspan font-family="Helvetica Neue" font-size="12" font-weight="400" fill="black" y="13"> </tspan>
+          <tspan font-family="Helvetica Neue" font-size="12" font-weight="400" fill="black" x="0" y="30">1. </tspan>
+          <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="black" y="30">对于单个node来说减少不必要资源消耗</tspan>
+          <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="black" x="0" y="47">2. RPC 调用数量不产生差异</tspan>
+          <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="black" x="0" y="64">3. 出了master-node 以外其他节点不用关系非自己节点的消息</tspan>
+        </text>
+      </g>
+      <g id="Graphic_469">
+        <text transform="translate(-1019 2360.5)" fill="black">
+          <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="black" x="0" y="13">缺点：</tspan>
+          <tspan font-family="Helvetica Neue" font-size="12" font-weight="400" fill="black" y="13"> </tspan>
+          <tspan font-family="Helvetica Neue" font-size="12" font-weight="400" fill="black" x="0" y="30">1. </tspan>
+          <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="black" y="30">需要一个master-node, 否则对客户端不友好</tspan>
+          <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="black" x="0" y="47">2. 对于需要同步所有节点的事件，不友好</tspan>
+          <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="black" x="0" y="64">3. 需要依赖registry</tspan>
+          <tspan font-family="PingFang SC" font-size="12" font-weight="400" fill="black" x="0" y="81">4. Master-node 如何分配请求到不同节点？</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>

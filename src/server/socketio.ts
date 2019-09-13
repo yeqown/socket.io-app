@@ -1,9 +1,11 @@
 // import { proto } from "@/types"
 // import express from 'express'
 import io from 'socket.io'
+import redisAdapter, { SocketIORedisOptions } from 'socket.io-redis'
 import express from 'express'
 import { Request, Response } from "express";
 import http from 'http'
+import { ClientOpts as RedisOpts } from 'redis'
 // import { RedisClient } from 'redis'
 
 import { proto, IJoinRoomsReq, AuthReq, IAuthReq, SocketioOptions, ISession, ApiResponse } from '../types'
@@ -73,8 +75,8 @@ class SocketioWrapper {
     // and not trigger online or offline evt
     _sockets: Map<string, SocketWrapper>
 
-    constructor(opt: SocketioOptions) {
-        logger.info("socketio-wrapper initializing with opts: ", opt);
+    constructor(opt: SocketioOptions, redisOpts: RedisOpts) {
+        logger.info("init SocketioWrapper with opts: ", opt, redisOpts);
         this.port = opt.port || 3000
 
         this._sm = new SManagerBasedRedis(redisClient)
@@ -89,10 +91,17 @@ class SocketioWrapper {
         this._app = express()
         this._app.use(express.urlencoded())
         this._httpSrv = http.createServer(this._app)
+
+        // generate socket.io server
+        let redisAdapterOpts: SocketIORedisOptions = {
+            host: redisOpts.host,
+            port: redisOpts.port,
+            auth_pass: redisOpts.password,
+        }
         this._io = io(this._httpSrv, {
             path: opt.path,
             transports: opt.transport ? opt.transport : undefined,
-        })
+        }).adapter(redisAdapter(redisAdapterOpts))
 
         this._mountHandlers()
         this._mountNsps()
@@ -159,9 +168,10 @@ class SocketioWrapper {
      * _mountNsps loads all nsp configs from configer then
      * register nsp into socket.io also handlers to evts includes built-in and custom
      */
-    private _mountNsps = () => {
-        this._nspConfiger.allNsp((err: Error | null, nspCfgs: INspConfig[]) => {
-            nspCfgs.forEach((cfg: INspConfig) => {
+    private _mountNsps = async () => {
+        try {
+            let cfgs = await this._nspConfiger.allNsp()
+            cfgs.forEach((cfg: INspConfig) => {
                 let nspName = addSlashLeft(cfg.name)
                 if (this._nsps.get(nspName)) {
                     logger.error("duplicate nsp name config: ", nspName)
@@ -183,8 +193,9 @@ class SocketioWrapper {
                 // record nsp
                 this._nsps.set(nspName, _nsp)
             })
-        })
-        // TODO: refused all connection to root Nsp
+        } catch (error) {
+            logger.error(error)
+        }
     }
 
     /**
@@ -220,8 +231,13 @@ class SocketioWrapper {
                 // call onoff emitter
                 let onoff = new OnoffMsg(_socket.getToken(), _socket.getMeta(), EventType.Off, socket.id, socket.handshake.address)
                 this._onoffEmitter.on(_nsp.name, onoff)
+
                 // call session manager
-                if (this._sm.delBySocketId(socket.id)) logger.error("could not delete session")
+                try {
+                    this._sm.delBySocketId(socket.id)
+                } catch (error) {
+                    logger.error("could not delete session, ", error)
+                }
             }
         })
 
@@ -233,7 +249,7 @@ class SocketioWrapper {
 
             if (reply.errcode == codes.OK) {
                 // true: auth success
-                // save socketid to socket and req meta
+                // save socketid to socket and request meta
                 this._sockets.set(socket.id, new SocketWrapper(socket, req))
                 // call onoff emitter
                 let clientIp = socket.handshake.address
@@ -259,10 +275,15 @@ class SocketioWrapper {
             logger.info("chat/users recv msg: ", uMsgs)
             uMsgs.forEach((msg: proto.IUsersMessage) => {
                 this._sm.queryByUserId(msg.userId, msg.nspName)
-                    .then((v: ISession | Error) => {
-                        if (v instanceof Error) { logger.error("could not get session by userId=", msg.userId); return }
+                    .then((v: ISession) => {
                         let _socket = this._sockets.get(v.socketId)
-                        if (_socket) _socket.getSocket().emit(msg.msg.evt, msg.msg)
+                        if (_socket) {
+                            _socket.getSocket().emit(msg.msg.evt, msg.msg)
+                        }
+                    })
+                    .catch((err: Error) => {
+                        logger.error(`could not get session by userId=${msg.userId}, err=${err}`)
+                        return
                     })
             })
         })
@@ -308,7 +329,7 @@ class SocketioWrapper {
     broadcast = (nspName: string, msg: proto.IMessage): void => {
         nspName = addSlashLeft(nspName)
         const _nsp = this._nsps.get(nspName)
-        if (_nsp === undefined) {
+        if (!_nsp) {
             logger.error(__filename, "could not get nsp by name: ", nspName)
             return
         }
@@ -353,23 +374,25 @@ class SocketioWrapper {
      * deactiveByUserId disconnect
      * disconnect with client by userId
      */
-    deactiveByUserId = (nspName: string, userId: number) => {
+    deactiveByUserId = async (nspName: string, userId: number) => {
         nspName = addSlashLeft(nspName)
         let _nsp = this._nsps.get(nspName)
         if (!_nsp) {
             logger.error(__filename, 365, "could not find nsp by nspName=", nspName)
+            return
         }
-        this._sm.queryByUserId(userId, nspName)
-            .then((v: ISession | Error) => {
-                if (v instanceof Error) {
-                    logger.error(__filename, 371, `could not find session by userId=${userId}, err=${v}`)
-                    return
-                }
 
-                let _socket = this._sockets.get(v.socketId)
-                if (!_socket) { logger.error(`could not get socket by socketId=${v.socketId}`); return }
-                _socket.getSocket().disconnect(true)
-            })
+        try {
+            let session = await this._sm.queryByUserId(userId, nspName)
+            let _socket = this._sockets.get(session.socketId)
+            if (!_socket) {
+                logger.error(`could not get socket by socketId=${session.socketId}`)
+                return
+            }
+            _socket.getSocket().disconnect(true)
+        } catch (error) {
+            logger.error(`could not find session by userId=${userId}, err=${error}`)
+        }
     }
 
 
@@ -377,23 +400,24 @@ class SocketioWrapper {
      * knockoutFromRoom
      * force client for be disconnected
      */
-    knockoutFromRoom = (nspName: string, roomId: string, userId: number) => {
+    knockoutFromRoom = async (nspName: string, roomId: string, userId: number) => {
         nspName = addSlashLeft(nspName)
         let _nsp = this._nsps.get(nspName)
         if (!_nsp) {
             logger.error("could not find nsp by nspName=", nspName)
         }
-        this._sm.queryByUserId(userId, nspName)
-            .then((v: ISession | Error) => {
-                if (v instanceof Error) {
-                    logger.error(__filename, 395, `could not find session by userId=${userId}, err=${v}`)
-                    return
-                }
 
-                let _socket = this._sockets.get(v.socketId)
-                if (!_socket) { logger.error(`could not get socket by socketId=${v.socketId}`); return }
-                _socket.getSocket().leave(roomId)
-            })
+        try {
+            let session = await this._sm.queryByUserId(userId, nspName)
+            let _socket = this._sockets.get(session.socketId)
+            if (!_socket) {
+                logger.error(`could not get socket by socketId=${session.socketId}`);
+                return
+            }
+            _socket.getSocket().leave(roomId)
+        } catch (error) {
+            logger.error(`could not find session by userId=${userId}, err=${error}`)
+        }
     }
 
     /**
@@ -425,52 +449,51 @@ class SocketioWrapper {
     /**
      * TODO: add mroe nsp info
      */
-    hdlGetAllNsps = (req: Request, resp: Response) => {
+    hdlGetAllNsps = async (req: Request, resp: Response) => {
         let r = new ApiResponse()
-
-        this._nspConfiger.allNsp((err: Error | null, cfgs: INspConfig[]) => {
-            if (err) {
-                r.setErrcode(codes.ServerErr, err.message)
-                resp.json() && resp.end()
-                return
+        try {
+            let cfgs = await this._nspConfiger.allNsp()
+            if (cfgs && cfgs.length) {
+                r.setErrcode(codes.OK)
+                r.setData(cfgs)
+                resp.json(r) && resp.end()
             }
-            r.setErrcode(codes.OK)
-            r.setData(cfgs)
-            resp.json(r) && resp.end()
-        })
+        } catch (error) {
+            r.setErrcode(codes.ServerErr, error.message)
+            resp.json() && resp.end()
+            return
+        }
     }
 
     /**
      * 
      * TODO: add nsp monitor data
      */
-    hdlGetNsp = (req: Request, resp: Response) => {
+    hdlGetNsp = async (req: Request, resp: Response) => {
         let r = new ApiResponse()
         let { nspName } = req.params
-        // logger.info(req.path)
-        this._nspConfiger
-            .allNsp((err: Error | null, cfgs: INspConfig[]) => {
-                if (err) {
-                    r.setErrcode(codes.ServerErr)
-                    resp.json() && resp.end()
-                    return
-                }
 
-                let nsps = cfgs.filter((cfg: INspConfig) => {
-                    return nspName === cfg.name
-                })
-
-                r.setErrcode(codes.OK)
-                r.setData(nsps)
-                resp.json(r) && resp.end()
+        try {
+            let cfgs = await this._nspConfiger.allNsp()
+            let nsps = cfgs.filter((cfg: INspConfig) => {
+                return nspName === cfg.name
             })
+
+            r.setErrcode(codes.OK)
+            r.setData(nsps)
+            resp.json(r) && resp.end()
+        } catch (error) {
+            r.setErrcode(codes.ServerErr)
+            resp.json() && resp.end()
+            return
+        }
     }
 
     /**
      * hdlGenNsp generate an Nsp with config
      * TODO: multi node to sync the nsp config, for now, you have to restart server manually
      */
-    hdlGenNsp = (req: Request, resp: Response) => {
+    hdlGenNsp = async (req: Request, resp: Response) => {
         logger.info(req.body)
         let r = new ApiResponse()
         let { nspName = '', evts } = req.body
@@ -491,17 +514,16 @@ class SocketioWrapper {
         }
 
         let cfg = new NspConfig(nspName, evts)
-        this._nspConfiger.applyFor(cfg, (err: Error | null) => {
-            if (err) {
-                r.setErrcode(codes.ServerErr, err.message)
-                resp.json(r) && resp.end()
-                return
-            }
+        try {
+            await this._nspConfiger.applyFor(cfg)
             r.setErrcode(codes.OK)
             resp.json(r) && resp.end()
             return
-        })
-
+        } catch (error) {
+            r.setErrcode(codes.ServerErr, error.message)
+            resp.json(r) && resp.end()
+            return
+        }
     }
 
     /**

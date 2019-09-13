@@ -1,9 +1,14 @@
 const lib = require('../../lib/dist/lib')
 const readline = require('readline')
 
+let { PORT } = process.env
+if (!PORT) {
+    throw new Error("empty PORT in env list")
+}
+
 const main = () => {
     let client = new lib.Client(
-        { host: "http://localhost:3000", nspName: "demo", path: "/socket.io", },
+        { host: `http://localhost:${PORT}`, nspName: "demo", path: "/socket.io", },
         [
             {
                 evt: 'disconnect',

@@ -25,26 +25,31 @@ function main() {
                 })
                 .option("rpcPort", {
                     description: "rpc server listening on",
-                    default: 3001
+                    alias: "rpc-port",
+                    default: undefined,
+                    number: true,
+
                 })
                 .option("socketioPort", {
                     description: "socket-io server listening on",
-                    default: 3000
+                    alias: "port",
+                    default: undefined,
+                    number: true,
                 })
         }, (argv) => {
-            run(argv.log4jsConf, argv.conf)
+            run(argv.log4jsConf, argv.conf, argv.rpcPort, argv.socketioPort)
         })
         .version("1.0.0")
         .help(true)
         .argv
 
     // ignore this value
-    // console.log(argv);
-    argv
+    console.log(argv)
 }
 
 
-const run = async (log4jsConf: string, conf: Required<string>) => {
+const run = async (log4jsConf: Required<string>, conf: Required<string>,
+    rpcPort?: number, socketioPort?: number) => {
     // Step: config logger
     configureLogger(path.join(__dirname, log4jsConf))
     // const configureLoggerAsync = promisify<string, Logger | null>(configureLogger)
@@ -61,12 +66,18 @@ const run = async (log4jsConf: string, conf: Required<string>) => {
     await initialMgo(cfg.mgoOpts)
 
     // Step: socketio server
-    // let opt: Options = cfg.
-    let s: SocketioWrapper = initialSocketio(cfg.socketioOpts)
+    if (socketioPort) {
+        cfg.socketioOpts.port = socketioPort
+        console.log(cfg.socketioOpts);
+
+    }
+    let s: SocketioWrapper = initialSocketio(cfg.socketioOpts, cfg.redisOpts)
     s.serve()
 
     // Step: gRPC server
-    // let opt2: gOptions = { port: 3001 }
+    if (rpcPort) {
+        cfg.grpcOpts.port = rpcPort
+    }
     let s2: gRPCService = initialRPC(cfg.grpcOpts, s)
     s2.serve()
 }
