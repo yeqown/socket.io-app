@@ -1,5 +1,5 @@
 import { RedisClient } from "redis"
-import { IAuthReq, Session, ISession, Err } from "../types"
+import { IAuthReq, Session, ISession } from "../types"
 import { logger } from "../utils/ins"
 import { rmSlashLeft } from '../utils'
 import { promisify } from 'util'
