@@ -2,10 +2,8 @@ import path from 'path'
 import yargs, { Argv } from 'yargs'
 
 import { initialSocketio, initialRPC, gRPCService, SocketioWrapper } from './server'
-// import { } from './server/socketio'
-// import { } from './server/grpc'
 import { Config } from './utils'
-import { redisClient, initialRedis, configureLogger, logger } from './utils/ins'
+import { initialRedis, configureLogger, logger, initialMgo } from './utils/ins'
 // import { promisify } from 'util'
 // import { Logger } from 'log4js'
 // import { GrpcServerOptions, SocketioOptions } from './types'
@@ -27,26 +25,31 @@ function main() {
                 })
                 .option("rpcPort", {
                     description: "rpc server listening on",
-                    default: 3001
+                    alias: "rpc-port",
+                    default: undefined,
+                    number: true,
+
                 })
                 .option("socketioPort", {
                     description: "socket-io server listening on",
-                    default: 3000
+                    alias: "port",
+                    default: undefined,
+                    number: true,
                 })
         }, (argv) => {
-            run(argv.log4jsConf, argv.conf)
+            run(argv.log4jsConf, argv.conf, argv.rpcPort, argv.socketioPort)
         })
         .version("1.0.0")
         .help(true)
         .argv
 
     // ignore this value
-    // console.log(argv);
-    argv
+    console.log(argv)
 }
 
 
-const run = (log4jsConf: string, conf: Required<string>) => {
+const run = async (log4jsConf: Required<string>, conf: Required<string>,
+    rpcPort?: number, socketioPort?: number) => {
     // Step: config logger
     configureLogger(path.join(__dirname, log4jsConf))
     // const configureLoggerAsync = promisify<string, Logger | null>(configureLogger)
@@ -59,17 +62,22 @@ const run = (log4jsConf: string, conf: Required<string>) => {
     // Step: load redis
     initialRedis(cfg.redisOpts)
 
-    // TODO: Step: load mongo
-    // initialMongo(cfg.MongoOpts)
+    // Step: load mongo
+    await initialMgo(cfg.mgoOpts)
 
     // Step: socketio server
-    // let opt: Options = cfg.
-    let s: SocketioWrapper = initialSocketio(cfg.socketioOpts, redisClient)
+    if (socketioPort) {
+        cfg.socketioOpts.port = socketioPort
+        console.log(cfg.socketioOpts);
+    }
+    let s: SocketioWrapper = initialSocketio(cfg.socketioOpts, cfg.redisOpts)
     s.serve()
 
     // Step: gRPC server
-    // let opt2: gOptions = { port: 3001 }
-    let s2: gRPCService = initialRPC(cfg.grpcOpts, s)
+    if (rpcPort) {
+        cfg.grpcOpts.port = rpcPort
+    }
+    let s2: gRPCService = initialRPC(cfg.grpcOpts, s, cfg.redisOpts)
     s2.serve()
 }
 

@@ -1,8 +1,21 @@
 {
     "appenders": {
-        "file": {
-            "type": "fileSync",
-            "filename": "logs/file.log",
+        "dev": {
+            "type": "stdout",
+            "filename": "logs/app.log",
+            "maxLogSize": 10485760,
+            "numBackups": 5,
+            "compress": true,
+            "encoding": "utf-8",
+            "mode": "0640",
+            "layout": {
+                "type": "pattern",
+                "pattern": "[%f:%l] [%d] [%p] [%c] ｜　%m"
+            }
+        },
+        "prod": {
+            "type": "stdout",
+            "filename": "logs/app.log",
             "maxLogSize": 10485760,
             "numBackups": 5,
             "compress": true,
@@ -12,26 +25,25 @@
                 "type": "pattern",
                 "pattern": "[%d] [%p] [%c] ｜　%m"
             }
-        },
-        "out": {
-            "type": "stdout"
-        },
-        "err": {
-            "type": "stderr"
         }
     },
     "categories": {
-        "file": {
-            "appenders": [
-                "file"
-            ],
-            "level": "debug"
-        },
         "default": {
             "appenders": [
-                "file",
-                "out",
-                "err"
+                "dev"
+            ],
+            "level": "info"
+        },
+        "dev": {
+            "appenders": [
+                "dev"
+            ],
+            "level": "debug",
+            "enableCallStack": true
+        },
+        "prod": {
+            "appenders": [
+                "prod"
             ],
             "level": "debug"
         }

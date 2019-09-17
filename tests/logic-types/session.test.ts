@@ -35,11 +35,13 @@ describe("logic.session", () => {
         meta,
     }
 
-    it("session.set", () => {
-        let v = sm.set(socketId, nspName, clientIp, req)
-        // assert(v instanceof Error)
-        // assert(v instanceof Error)
-        assert(v === null)
+    it("session.set", async () => {
+        try {
+            let v = await sm.set(socketId, nspName, clientIp, req)
+            assert(v !== null)
+        } catch (error) {
+            assert(error === null)
+        }
     })
 
     it("session.query", () => {
@@ -71,15 +73,14 @@ describe("logic.session", () => {
         })
     })
 
-    it("session.delete", () => {
-        let err = sm.delBySocketId(socketId)
-        assert(err == null)
-
-        // reset
-        err = sm.set(socketId, nspName, clientIp, req)
-        assert(err === null)
-        err = sm.delByUserId(userId, nspName)
-        assert(err === null)
-        // assert(err! instanceof Error)
+    it("session.delete", async () => {
+        try {
+            let result = await sm.delBySocketId(socketId)
+            await sm.set(socketId, nspName, clientIp, req)
+            result = await sm.delByUserId(userId, nspName)
+            assert(result !== null)
+        } catch (error) {
+            assert(error === null)
+        }
     })
 })

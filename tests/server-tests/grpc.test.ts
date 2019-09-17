@@ -60,7 +60,7 @@ describe("grpcServers", () => {
         req.setMsgsList([roomMsg])
 
         client.nspRoomsBroadcast(req, (err: grpc.ServiceError | null, resp: api_pb.NspRoomsBroadcastResp) => {
-            // console.log("req: ", req);
+            // console.log(err, resp);
             // console.log("err: ", err);
             // console.log("resp: ", resp.getErrcode(), resp.getErrmsg());
             assert(err === null)

@@ -8,7 +8,7 @@
     "compile": "node compile.js",
     "start": "node ./dist/main.js start",
     "test": "npm run test-ts",
-    "dev": "npm run compile && npm run start"
+    "dev": "npm run compile && NODE_ENV=dev npm run start"
   },
   "repository": {
     "type": "git",
@@ -34,6 +34,7 @@
     "@types/redis": "^2.8.13",
     "@types/socket.io": "^2.1.2",
     "@types/socket.io-client": "^1.4.32",
+    "@types/socket.io-redis": "^1.0.25",
     "@types/uuid": "^3.4.5",
     "@types/yargs": "^13.0.2",
     "grpc-tools": "^1.8.0",
@@ -50,6 +51,7 @@
     "mongodb": "^3.3.2",
     "redis": "^2.8.0",
     "socket.io": "^2.2.0",
+    "socket.io-redis": "^5.2.0",
     "uuid": "^3.3.3",
     "yargs": "^14.0.0"
   }
