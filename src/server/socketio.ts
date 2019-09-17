@@ -241,7 +241,7 @@ class SocketioWrapper {
             }
         })
 
-        socket.on("auth", (req: AuthReq) => {
+        socket.on("auth", async (req: AuthReq) => {
             logger.info("auth socketId: ", socket.id, "args:", req)
             // call Auth Logic
             let reply = this._auth.verify(req)
@@ -256,7 +256,11 @@ class SocketioWrapper {
                 let onoff = new OnoffMsg(req.token, req.meta, EventType.On, socket.id, clientIp)
                 this._onoffEmitter.on(_nsp.name, onoff)
                 // call session manager
-                if (this._sm.set(socket.id, _nsp.name, clientIp, req)) logger.error("could not set session")
+                try {
+                    await this._sm.set(socket.id, _nsp.name, clientIp, req)
+                } catch (error) {
+                    logger.error("could not set session, ", error)
+                }
             } else {
                 // auth failed
                 socket.disconnect(true)
@@ -330,7 +334,7 @@ class SocketioWrapper {
         nspName = addSlashLeft(nspName)
         const _nsp = this._nsps.get(nspName)
         if (!_nsp) {
-            logger.error(__filename, "could not get nsp by name: ", nspName)
+            logger.error("could not get nsp by name: ", nspName)
             return
         }
         _nsp.emit(msg.evt, msg)
@@ -415,6 +419,7 @@ class SocketioWrapper {
                 return
             }
             _socket.getSocket().leave(roomId)
+            logger.info(`knockout userId=${userId} from room=${roomId}`)
         } catch (error) {
             logger.error(`could not find session by userId=${userId}, err=${error}`)
         }

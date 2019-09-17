@@ -12,9 +12,9 @@ function initialSocketio(opt: SocketioOptions, redisOpts: ClientOpts): SocketioW
     return s
 }
 
-function initialRPC(opt: GrpcServerOptions, srv: SocketioWrapper): gRPCService {
+function initialRPC(opt: GrpcServerOptions, srv: SocketioWrapper, redisOpts: ClientOpts): gRPCService {
     // console.log("initialRPC service with opt:", opt);
-    let s = new gRPCService(opt, srv)
+    let s = new gRPCService(opt, srv, redisOpts)
     return s
 }
 

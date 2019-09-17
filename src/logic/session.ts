@@ -37,22 +37,22 @@ class SManagerBasedRedis implements ISessionManager {
      */
     set(socketId: string, nspName: string, clientIp: string, req: IAuthReq): Promise<any> {
         logger.info("set session: ", socketId, nspName, clientIp)
-
         let session = new Session(req, nspName, socketId, clientIp)
-        let v = session.marshal()
 
         const result = new Promise<any>((resolve, reject) => {
+            let v = session.marshal()
+
             let multi = this.rc.multi()
             multi.set(SManagerBasedRedis._genSocketIdKey(socketId), v)
             multi.set(SManagerBasedRedis._genUserIdKey(req.userId, nspName), v)
             multi.exec_atomic((err: Error | null, reply: any) => {
                 if (err) {
-                    logger.error(__filename, "could not set session")
+                    logger.error("could not set session:", err)
                     reject(err)
                 }
 
                 if (reply) {
-                    logger.info(__filename, `set session=${session} with reply: ${reply}`)
+                    logger.info(`set session=${session} with reply: ${reply}`)
                     resolve(reply)
                 }
             })

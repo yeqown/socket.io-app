@@ -69,7 +69,6 @@ const run = async (log4jsConf: Required<string>, conf: Required<string>,
     if (socketioPort) {
         cfg.socketioOpts.port = socketioPort
         console.log(cfg.socketioOpts);
-
     }
     let s: SocketioWrapper = initialSocketio(cfg.socketioOpts, cfg.redisOpts)
     s.serve()
@@ -78,7 +77,7 @@ const run = async (log4jsConf: Required<string>, conf: Required<string>,
     if (rpcPort) {
         cfg.grpcOpts.port = rpcPort
     }
-    let s2: gRPCService = initialRPC(cfg.grpcOpts, s)
+    let s2: gRPCService = initialRPC(cfg.grpcOpts, s, cfg.redisOpts)
     s2.serve()
 }
 

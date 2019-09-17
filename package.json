@@ -8,7 +8,7 @@
     "compile": "node compile.js",
     "start": "node ./dist/main.js start",
     "test": "npm run test-ts",
-    "dev": "npm run compile && npm run start"
+    "dev": "npm run compile && NODE_ENV=dev npm run start"
   },
   "repository": {
     "type": "git",

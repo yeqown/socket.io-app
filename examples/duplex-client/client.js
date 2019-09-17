@@ -1,14 +1,18 @@
 const lib = require('../../lib/dist/lib')
 const readline = require('readline')
 
-let { PORT } = process.env
-if (!PORT) {
+let { IM_HOST, NSP_NAME } = process.env
+if (!IM_HOST) {
     throw new Error("empty PORT in env list")
 }
+if (!NSP_NAME) {
+    throw new Error("empty NSP_NAME in env list")
+}
+
 
 const main = () => {
     let client = new lib.Client(
-        { host: `http://localhost:${PORT}`, nspName: "demo", path: "/socket.io", },
+        { host: IM_HOST, nspName: NSP_NAME, path: "/socket.io", },
         [
             {
                 evt: 'disconnect',
@@ -63,7 +67,7 @@ const main = () => {
                 let roomId = roomIds[Math.floor(Math.random() * 10) % roomIds.length]
                 console.log(`sending a message to ${roomId}`);
                 client.sendInRoom(roomId, { content: "interval", roomId: roomId })
-            }, 5000)
+            }, 10000)
         })
 
     })

@@ -9,6 +9,19 @@ interface IMessage {
     id: Required<string>,
 }
 
+function loadFromPbMessage(pbm?: pbMessage): IMessage {
+    if (!pbm) {
+        throw Error("invalid pb.Message, undefined")
+    }
+
+    return {
+        meta: JSON.parse(pbm.getMeta()),
+        ver: pbm.getVer(),
+        evt: pbm.getEvt(),
+        id: pbm.getId() || v4(),
+    }
+}
+
 class Message implements IMessage {
     ver: string
     meta: any
@@ -22,8 +35,8 @@ class Message implements IMessage {
         this.meta = meta
     }
 
-    loadFromPb(pbm: pbMessage | undefined): IMessage {
-        if (pbm === undefined) {
+    loadFromPb(pbm?: pbMessage): IMessage {
+        if (!pbm) {
             console.log("meet an undefined api_pb.Message")
             return this
         }
@@ -71,7 +84,13 @@ class UsersMessage implements IUsersMessage {
     }
 }
 
+interface IKnockoutMeta {
+    userId: number
+    roomId: string
+}
+
 export {
-    IMessage, IRoomsMessage, IUsersMessage,
-    Message, RoomsMessage, UsersMessage
+    IMessage, IRoomsMessage, IUsersMessage, IKnockoutMeta,
+    Message, RoomsMessage, UsersMessage,
+    loadFromPbMessage,
 }
