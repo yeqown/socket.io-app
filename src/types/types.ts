@@ -1,4 +1,4 @@
-import { codes, getMessage } from "../utils"
+import { codes, getMessage } from './codes'
 
 export interface ISession {
     userId: number,

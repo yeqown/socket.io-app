@@ -2,13 +2,19 @@
   "name": "lib",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "compile": "rm -fr ./dist && ./node_modules/.bin/tsc"
+    "compile": "rm -fr ./dist && ./node_modules/.bin/webpack --config webpack.config.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "typescript": "^3.6.2"
+    "ts-loader": "^6.1.0",
+    "typescript": "^3.6.2",
+    "webpack": "^4.40.2",
+    "webpack-cli": "^3.3.9"
+  },
+  "dependencies": {
+    "socket.io-client": "^2.2.0"
   }
 }

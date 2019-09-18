@@ -8,7 +8,7 @@
 import { RedisClient, createClient, ClientOpts } from 'redis'
 import log4js, { Logger } from 'log4js'
 import { MongoClient } from 'mongodb'
-import { MongoOptions } from '../types'
+import { MongoOptions } from '../types/opts'
 // import { Config } from '../utils/confs'
 // import { promisify } from 'util'
 

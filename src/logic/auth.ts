@@ -1,5 +1,5 @@
-import { IAuthReq, AuthReply, IAuthReply, AuthReq } from '../types'
-import { Des, DesAlgorithm, codes, getMessage } from '../utils'
+import { IAuthReq, AuthReply, IAuthReply, AuthReq, codes, getMessage } from '../types'
+import { Des, DesAlgorithm } from '../utils/des'
 
 interface ITokenr {
     verify(req: IAuthReq): IAuthReply

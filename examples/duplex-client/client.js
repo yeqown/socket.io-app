@@ -1,5 +1,7 @@
-const lib = require('../../lib/dist/lib')
+const lib = require('../../lib/dist/lib.slim')
+// import * as lib from '../../lib/dist/bundle'
 const readline = require('readline')
+// const Client = lib.Client
 
 let { IM_HOST, NSP_NAME } = process.env
 if (!IM_HOST) {
@@ -9,6 +11,7 @@ if (!NSP_NAME) {
     throw new Error("empty NSP_NAME in env list")
 }
 
+// console.log("find lib: ", lib)
 
 const main = () => {
     let client = new lib.Client(

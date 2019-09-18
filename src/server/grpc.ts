@@ -1,7 +1,7 @@
 import grpc, { GrpcObject } from "grpc"
 import grpc_pb from '../codegen/api/api_grpc_pb'
 import api_pb from "../codegen/api/api_pb";
-import { logger, redisClient } from '../utils/ins'
+import { logger } from '../utils/ins'
 import { SocketioWrapper } from "./socketio";
 import { proto, GrpcServerOptions, codes, getMessage } from "../types";
 import { RedisClient, createClient, ClientOpts as RedisOpts } from "redis";
@@ -58,7 +58,7 @@ class gRPCService {
 
     port: number
     _socketioSrv: SocketioWrapper
-    _rc: RedisClient
+    // _rc: RedisClient
     _pub: RedisClient
     _sub: RedisClient
     // _srv: grpc.Server
@@ -67,7 +67,7 @@ class gRPCService {
         logger.info("init gRPCService with opt: ", opt);
         this.port = opt.port
         this._socketioSrv = socketioSrv
-        this._rc = redisClient
+        // this._rc = redisClient
         this._pub = createClient(redisOpts)
         this._sub = createClient(redisOpts)
     }
@@ -108,10 +108,10 @@ class gRPCService {
     }
 
     /**
-     * _subcribeCommandsToRedis
+     * _subscribeCommandsToRedis
      * recv all command from redis `pub/sub` and execute
      */
-    private _subcribeCommandsToRedis() {
+    private _subscribeCommandsToRedis() {
         this._sub.on("message", (ch: string, message: string) => {
             logger.info("recv an command from: ", ch, message)
             try {
@@ -151,7 +151,7 @@ class gRPCService {
             clearRooms: this.clearRooms,
         })
         // start subscribe commands
-        this._subcribeCommandsToRedis()
+        this._subscribeCommandsToRedis()
 
         _srv.bind("0.0.0.0:" + this.port.toString(), grpc.ServerCredentials.createInsecure())
         _srv.start()

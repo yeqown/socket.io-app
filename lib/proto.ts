@@ -1,10 +1,4 @@
 import { v4 } from 'uuid'
-import {
-    Message as pbMessage,
-    RoomMessage as pbRoomMessage,
-    UserMessage as pbUserMessage
-} from '../codegen/api/api_pb'
-// import { logger } from '../utils/logger'
 
 interface IMessage {
     ver: Required<string>,
@@ -29,40 +23,10 @@ function genMessage(evt: string, ver?: string, meta?: string, id?: string): IMes
     }
 }
 
-/**
- * loadFromPbMessage load api_pb.Message into IMessage
- * @param pbm 
- */
-function loadFromPbMessage(pbm?: pbMessage): IMessage {
-    if (!pbm) {
-        throw Error("invalid pb.Message, undefined")
-    }
-
-    return {
-        meta: JSON.parse(pbm.getMeta()),
-        ver: pbm.getVer(),
-        evt: pbm.getEvt(),
-        id: pbm.getId() || v4(),
-    }
-}
-
 interface IRoomsMessage {
     roomId: Required<string>,
     nspName: Required<string>
     msg: Required<IMessage>,
-}
-
-/**
- * 
- * @param msg 
- * @param nspName 
- */
-function loadFromPbRoomsMessage(msg: pbRoomMessage, nspName: string): IRoomsMessage {
-    return {
-        roomId: msg.getRoomid(),
-        nspName: nspName,
-        msg: loadFromPbMessage(msg.getMsg()),
-    }
 }
 
 /**
@@ -87,19 +51,6 @@ interface IUsersMessage {
 
 /**
  * 
- * @param msg 
- * @param nspName 
- */
-function loadFromPbUserMessage(msg: pbUserMessage, nspName: string): IUsersMessage {
-    return {
-        nspName: nspName,
-        userId: msg.getUserid(),
-        msg: loadFromPbMessage(msg.getMsg()),
-    }
-}
-
-/**
- * 
  * @param nspName 
  * @param userId 
  * @param msg 
@@ -113,13 +64,26 @@ function genUsersMessage(nspName: string, userId: number, msg: IMessage): IUsers
 }
 
 
+
 interface IKnockoutMeta {
     userId: number
     roomId: string
 }
 
+
+interface IAuthReq {
+    token: string,
+    userId: number,
+    meta: object,
+}
+
+
+interface IAuthReply {
+    errmsg: string,
+    errcode: number,
+}
+
 export {
-    IMessage, IRoomsMessage, IUsersMessage, IKnockoutMeta,
-    loadFromPbMessage, loadFromPbRoomsMessage, loadFromPbUserMessage,
+    IMessage, IRoomsMessage, IUsersMessage, IKnockoutMeta, IAuthReq, IAuthReply,
     genMessage, genRoomsMessage, genUsersMessage,
 }

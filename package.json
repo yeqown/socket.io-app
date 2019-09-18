@@ -25,7 +25,6 @@
   "homepage": "https://github.com/yeqown/socket.io-app#readme",
   "devDependencies": {
     "@grpc/proto-loader": "^0.5.2",
-    "@types/bluebird": "^3.5.27",
     "@types/express": "^4.17.1",
     "@types/google-protobuf": "^3.7.1",
     "@types/mocha": "^5.2.7",
@@ -44,6 +43,7 @@
     "typescript": "^3.6.2"
   },
   "dependencies": {
+    "bufferutil": "^4.0.1",
     "express": "^4.17.1",
     "google-protobuf": "^3.9.1",
     "grpc": "^1.23.3",
@@ -52,6 +52,7 @@
     "redis": "^2.8.0",
     "socket.io": "^2.2.0",
     "socket.io-redis": "^5.2.0",
+    "utf-8-validate": "^5.0.2",
     "uuid": "^3.3.3",
     "yargs": "^14.0.0"
   }
