@@ -1,4 +1,4 @@
-import { codes, getMessage } from "../utils"
+import { codes, getMessage } from './codes'
 
 export interface ISession {
     userId: number,
@@ -26,19 +26,19 @@ export class Session implements ISession {
         this.nsp = nsp || ""
     }
 
-    private _toObject(): Object {
-        return new Object({
+    private toObject(): ISession {
+        return {
             userId: this.userId,
             socketId: this.socketId,
             clientIp: this.clientIp,
             token: this.token,
             nsp: this.nsp,
             meta: this.meta,
-        })
+        }
     }
 
     marshal(): string {
-        return JSON.stringify(this._toObject())
+        return JSON.stringify(this.toObject())
     }
 
     unmarshal(d: string): ISession {
@@ -109,10 +109,10 @@ export class AuthReply implements IAuthReply {
     }
 }
 
-export interface Err {
-    errCode: number,
-    errMsg: string,
-}
+// export interface Err {
+//     errCode: number,
+//     errMsg: string,
+// }
 
 
 export class ApiResponse {

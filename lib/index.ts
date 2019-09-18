@@ -1,30 +1,49 @@
-import { IAuthReply, IJoinRoomsReq } from '../src/types/types'
-import * as proto from '../src/types/proto'
-import { ITokenr, DesTokenr } from '../src/logic/auth'
-// import SocketIOClient from 'socket.io-client'
 import io from 'socket.io-client'
-import { addSlashLeft } from '../src/utils'
 
-export interface IAuthCallback {
+// import { IAuthReply, IJoinRoomsReq } from '../src/types/types'
+import * as proto from './proto'
+import { ITokenr, DesTokenr } from './des'
+// import { addSlashLeft } from '../src/utils/lib'
+
+
+interface IJoinRoomReq {
+    roomId: string
+}
+
+interface IJoinRoomsReq {
+    rooms: IJoinRoomReq[]
+}
+
+interface IAuthReply {
+    errmsg: string,
+    errcode: number,
+}
+
+const addSlashLeft = (s: string): string => {
+    if (s[0] !== "/") return "/" + s
+    return s
+}
+
+interface IAuthCallback {
     (reply: IAuthReply): void
 }
 
-export interface CommonCallback {
+interface CommonCallback {
     (...args: any): void
 }
 
-export interface IClient {
+interface IClient {
     auth(userId: Required<number>, meta: any, cb: IAuthCallback): void
     join(req: IJoinRoomsReq, cb: CommonCallback): void
 }
 
-export interface Options {
+interface Options {
     host: Required<string>
     nspName: Required<string>
     path: string
 }
 
-export interface EvtCallback {
+interface EvtCallback {
     evt: string
     cb: CommonCallback
 }
@@ -35,8 +54,8 @@ export class Client implements IClient {
     _opt: Options
 
     constructor(opt: Options, cbs: EvtCallback[]) {
-        this._des = new DesTokenr()
         this._opt = opt
+        this._des = new DesTokenr()
         // console.log(addr, opt, cbs);
         let addr = opt.host + addSlashLeft(opt.nspName)
         this._socket = io(addr, opt)
@@ -63,9 +82,8 @@ export class Client implements IClient {
 
     sendInRoom(roomId: string, meta: any): void {
         // let meta = { content: }
-        let msg: proto.IMessage = new proto.Message(meta)
-        msg.evt = 'chat/rooms'
-        let roomsMsg: proto.IRoomsMessage = new proto.RoomsMessage(this._opt.nspName, roomId, msg)
+        let msg: proto.IMessage = proto.genMessage('chat/rooms')
+        let roomsMsg: proto.IRoomsMessage = proto.genRoomsMessage(this._opt.nspName, roomId, msg)
         try {
             this._socket.emit("chat/rooms", [roomsMsg])
         } catch (err) {
@@ -74,9 +92,8 @@ export class Client implements IClient {
     }
 
     sendToUser(userId: number, meta: any): void {
-        let msg: proto.IMessage = new proto.Message(meta)
-        msg.evt = "chat/users"
-        let usersMsg: proto.IUsersMessage = new proto.UsersMessage(this._opt.nspName, userId, msg)
+        let msg: proto.IMessage = proto.genMessage('chat/users')
+        let usersMsg: proto.IUsersMessage = proto.genUsersMessage(this._opt.nspName, userId, msg)
 
         try {
             this._socket.emit("chat/users", [usersMsg])

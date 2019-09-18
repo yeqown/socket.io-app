@@ -1,4 +1,3 @@
-
 /**
  * getNowTimestamp get timestamp (ms)
  */

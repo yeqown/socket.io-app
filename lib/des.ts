@@ -1,4 +1,6 @@
 import { createCipheriv, createDecipheriv, getCiphers } from 'crypto'
+import * as proto from './proto'
+import { codes, getMessage } from './codes'
 
 enum DesAlgorithm {
     CBC = 'des-cbc',
@@ -66,6 +68,56 @@ class Des {
     }
 }
 
-export {
-    Des, DesAlgorithm
+
+interface ITokenr {
+    verify(req: proto.IAuthReq): proto.IAuthReply
+    gen(userId: number, meta: any): proto.IAuthReq
 }
+
+class DesTokenr implements ITokenr {
+    static alg = DesAlgorithm.CBC
+    static key = "kV2CfasTWPmkHwfvoaE6eY"
+    static iv = "3hjaueLWe+YUoiOhnnzo2Y"
+
+    _des: Des
+
+    constructor() {
+        this._des = new Des(DesTokenr.alg, DesTokenr.key, DesTokenr.iv)
+    }
+
+    /**
+     * 
+     * @param userId 
+     * @param meta 
+     */
+    gen(userId: number, meta: any): proto.IAuthReq {
+        let tok = this._des.encrypt(JSON.stringify(meta))
+        return {
+            userId: userId,
+            meta: meta,
+            token: tok,
+        }
+    }
+
+    /**
+     * 
+     * @param req 
+     */
+    verify(req: proto.IAuthReq): proto.IAuthReply {
+        let encrypted = this._des.encrypt(JSON.stringify(req.meta))
+        // let reply: IAuthReply
+        if (req.token === encrypted) {
+            return {
+                errcode: codes.OK,
+                errmsg: getMessage(codes.OK),
+            }
+        }
+
+        return {
+            errcode: codes.TokenInvalid,
+            errmsg: getMessage(codes.TokenInvalid),
+        }
+    }
+}
+
+export { ITokenr, DesTokenr }

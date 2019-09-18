@@ -1,5 +1,5 @@
 import { RedisClient } from "redis"
-import { IAuthReq, Session, ISession, Err } from "../types"
+import { IAuthReq, Session, ISession } from "../types"
 import { logger } from "../utils/ins"
 import { rmSlashLeft } from '../utils'
 import { promisify } from 'util'
@@ -151,7 +151,7 @@ class SManagerBasedRedis implements ISessionManager {
 
         let v = await getAsync(key)
         if (!v) {
-            throw new Error("empty session string")
+            throw Error("empty session string")
         }
         return new Session().unmarshal(v)
         // let v = await getAsync(key).then((v: string) => {
@@ -175,7 +175,7 @@ class SManagerBasedRedis implements ISessionManager {
 
         let v = await getAsync(key)
         if (!v) {
-            throw new Error("empty session string")
+            throw Error("empty session string")
         }
 
         return new Session().unmarshal(v)

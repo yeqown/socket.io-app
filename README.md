@@ -16,9 +16,9 @@ socket.io-based realtime app
 * [x] fill gRPC server functions
 * [x] support nsp config with Database
 * [ ] fill http monitor handlers with class `logic/Monitor`
-* [ ] slim client lib output, resolving lib dependecy relationship, event into one file
+* [x] slim client lib output, resolving lib dependecy relationship, event into one file
 * [x] import and use `redis-adapter`
-* [ ] RPC support multi-node also to synchronize nspConfig, plan is: based on `redis` and `middleware` pattern
+* [x] RPC support multi-node also to synchronize nspConfig, plan is: based on `redis` and `middleware` pattern
 * [ ] fill API docs
 
 ### Dependencies
