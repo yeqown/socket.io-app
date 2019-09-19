@@ -48,8 +48,6 @@ interface EvtCallback {
     cb: CommonCallback
 }
 
-console.log("lib called")
-
 export class Client implements IClient {
     _socket: SocketIOClient.Socket
     _des: ITokenr
@@ -85,6 +83,7 @@ export class Client implements IClient {
     sendInRoom(roomId: string, meta: any): void {
         // let meta = { content: }
         let msg: proto.IMessage = proto.genMessage('chat/rooms')
+        msg.meta = JSON.stringify(meta)
         let roomsMsg: proto.IRoomsMessage = proto.genRoomsMessage(this._opt.nspName, roomId, msg)
         try {
             this._socket.emit("chat/rooms", [roomsMsg])
@@ -95,6 +94,7 @@ export class Client implements IClient {
 
     sendToUser(userId: number, meta: any): void {
         let msg: proto.IMessage = proto.genMessage('chat/users')
+        msg.meta = JSON.stringify(meta)
         let usersMsg: proto.IUsersMessage = proto.genUsersMessage(this._opt.nspName, userId, msg)
 
         try {

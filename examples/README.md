@@ -1,5 +1,7 @@
 # Examples
 
+> NOTICE: all this examples are under the `demo` namespace. remember to generate it by HTTP API. 
+
 ## prepare for examples [dev]
 
 1. start server, `cd socket.io-app && npm i && npm run dev`
@@ -27,6 +29,17 @@ recv chat/rooms message { ver: '1.0.0',
 ```
 
 ## chatroom frontend [TODO:]
+
+Here is the [CODE](../chatroom)
+
+> entry
+<img src="../images/entry.png">
+
+> chat1
+<img src="../images/chat1.png">
+
+> chat2
+<img src="../images/chat2.png">
 
 ## grpc commands scripts
 
