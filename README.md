@@ -8,18 +8,24 @@ socket.io-based realtime app
 * [x] based socket.io, it's stable
 * [x] `node.js` event driven
 
+### Examples
+
+[GOTO VIEW](examples/README.md)
+
 ### TODOs
 
-* [x] create examples
-* [x] import unittest frame `mocha` and write
-* [x] plugin session manager
-* [x] fill gRPC server functions
-* [x] support nsp config with Database
-* [ ] fill http monitor handlers with class `logic/Monitor`
-* [x] slim client lib output, resolving lib dependecy relationship, event into one file
-* [x] import and use `redis-adapter`
-* [x] RPC support multi-node also to synchronize nspConfig, plan is: based on `redis` and `middleware` pattern
-* [ ] fill API docs
+* [x] create examples.
+* [x] import unittest frame `mocha` and write.
+* [x] plugin session manager.
+* [x] fill gRPC server functions.
+* [x] support nsp config with Database.
+* [ ] fill http monitor handlers with class `logic/Monitor`.
+* [x] slim client lib output, resolving lib dependecy relationship, event into one file.
+* [x] import and use `redis-adapter`.
+* [x] RPC support multi-node, plan is: based on `redis` `PUB/SUB` and `middleware` pattern.
+* [ ] synchronize nspConfig changes.
+* [x] RPC API docs.
+* [ ] HTTP not finished yet.
 
 ### Dependencies
 

@@ -337,6 +337,7 @@ class SocketioWrapper {
             logger.error("could not get nsp by name: ", nspName)
             return
         }
+        logger.info("nsp broadcast, ", msg.evt, msg)
         _nsp.emit(msg.evt, msg)
     }
 

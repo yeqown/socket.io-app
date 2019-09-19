@@ -14,7 +14,7 @@ let msg = new api_pb.Message()
 msg.setVer("1.0.0")
 msg.setId("29381023jj")
 msg.setEvt("chat/rooms")
-msg.setMeta(JSON.stringify({ foo: "bar", code: 1 }))
+msg.setMeta(JSON.stringify({ username: "sys", content: "notice: you're on chatting", roomId: "0" }))
 req.setMsg(msg)
 req.setNspname("demo")
 

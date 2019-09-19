@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "compile": "rm -fr ./dist && ./node_modules/.bin/webpack --config webpack.config.js"
+    "clear": "rm -fr ./dist",
+    "compile-web": "./node_modules/.bin/webpack --config webpack.config.web.js",
+    "compile-node": "./node_modules/.bin/webpack --config webpack.config.node.js"
   },
   "author": "",
   "license": "ISC",

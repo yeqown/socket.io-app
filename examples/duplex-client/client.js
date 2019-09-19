@@ -1,4 +1,4 @@
-const lib = require('../../lib/dist/lib.slim')
+const lib = require('../../lib/dist/lib.node.slim')
 // import * as lib from '../../lib/dist/bundle'
 const readline = require('readline')
 // const Client = lib.Client
