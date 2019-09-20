@@ -29,31 +29,15 @@ interface IOnoffEmitter {
     off(nspName: string, data: IOnoff): void
 }
 
-
-class OnoffMsg implements IOnoff {
-    token: string // AuthReq 中的 Token
-    meta: any // AuthReq 中的 Meta
-    evtTyp: string // 事件类型: connect, disconnect(tcpclean)
-    evtTimestamp: number // 事件时间戳
-    socketId: string // 链接的唯一标志
-    clientIp: string // 客户端IP
-
-    constructor(token: string, meta: any, evtTyp: EventType, socketId: string, clientIp: string) {
-        this.token = token
-        this.meta = meta
-        this.evtTyp = evtTyp
-        this.evtTimestamp = getNowTimestamp()
-        this.socketId = socketId
-        this.clientIp = clientIp
-    }
-
-    /**
-     * validate
-     * validate the onoff message wtih standard rules
-     * TODO:
-     */
-    validate = (): Error | null => {
-        return null
+const genOnoffMsg = (token: string, meta: any, evtTyp: EventType,
+    socketId: string, clientIp: string): IOnoff => {
+    return {
+        token: token,
+        meta: meta,
+        evtTyp: evtTyp,
+        evtTimestamp: getNowTimestamp(),
+        socketId: socketId,
+        clientIp: clientIp,
     }
 }
 
@@ -134,7 +118,7 @@ class OnoffEmitterBasedRedis implements IOnoffEmitter {
 }
 
 export {
-    IOnoffEmitter,
-    OnoffMsg, OnoffEmitterBasedMQ, OnoffEmitterBasedRedis,
-    EventType
+    IOnoffEmitter, EventType,
+    OnoffEmitterBasedRedis,
+    genOnoffMsg,
 }

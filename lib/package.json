@@ -6,7 +6,8 @@
   "scripts": {
     "clear": "rm -fr ./dist",
     "compile-web": "./node_modules/.bin/webpack --config webpack.config.web.js",
-    "compile-node": "./node_modules/.bin/webpack --config webpack.config.node.js"
+    "compile-node": "./node_modules/.bin/webpack --config webpack.config.node.js",
+    "compile": "npm run clear && npm run compile-web && npm run compile-node"
   },
   "author": "",
   "license": "ISC",

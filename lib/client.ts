@@ -59,8 +59,8 @@ export class Client implements IClient {
         // console.log(addr, opt, cbs);
         let addr = opt.host + addSlashLeft(opt.nspName)
         this._socket = io(addr, opt)
-        this._socket.on("logic/error", (...args: any[]) => {
-            console.log("recv an error: ", args)
+        this._socket.on("logic/error", (err: any) => {
+            console.log("recv an error: ", err)
         })
 
         cbs.forEach((evtCb) => {
