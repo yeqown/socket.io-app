@@ -6,46 +6,12 @@ import express from 'express'
 import { Request, Response } from "express";
 import http from 'http'
 import { ClientOpts as RedisOpts } from 'redis'
-// import { RedisClient } from 'redis'
 
-import { proto, IJoinRoomsReq, AuthReq, IAuthReq, SocketioOptions, ISession, ApiResponse } from '../types'
+import { proto, SocketioOptions, ApiResponse } from '../types'
 import { codes, getMessage, addSlashLeft } from '../utils'
 import { logger, mgoClient, redisClient } from '../utils/ins'
-import {
-    ISessionManager, IOnoffEmitter,
-    SManagerBasedRedis, OnoffEmitterBasedRedis, OnoffMsg, EventType, ITokenr, DesTokenr,
-    INspConfiger, INspConfig, NspConfigRepo, NspConfig,
-} from '../logic'
-
-
-const _logicErrorEvt = "logic/error"
-
-
-class SocketWrapper {
-    private _socket: io.Socket
-    private _authreq: IAuthReq
-
-    constructor(socket: io.Socket, req: IAuthReq) {
-        this._socket = socket
-        this._authreq = req
-    }
-
-    getSocket(): io.Socket {
-        return this._socket
-    }
-
-    getUserId(): number {
-        return this._authreq.userId
-    }
-
-    getMeta(): any {
-        return this._authreq.meta
-    }
-
-    getToken(): string {
-        return this._authreq.token
-    }
-}
+import { ISessionManager, IOnoffEmitter, SManagerBasedRedis, OnoffEmitterBasedRedis, ITokenr, DesTokenr, INspConfiger, INspConfig, NspConfigRepo, NspConfig, } from '../logic'
+import { builtinEvts, getDisconnectEvtHdl, SocketWrapper, getAuthEvtHdl, getJoinEvtHdl, getChatusersEvthdl, getChatroomsEvtHdl, genSocketioErr } from './socketio_helper';
 
 /**
  * SocketioWrapper provides some simpe methods and calls logic
@@ -182,9 +148,8 @@ class SocketioWrapper {
                 let _nsp = this._io.of(nspName)
 
                 // TODO: using middleware
-
                 // handle connection to socket
-                _nsp.on("connection", (socket: io.Socket) => {
+                _nsp.on(builtinEvts.Connection, (socket: io.Socket) => {
                     logger.info("a new socket incomming, and it's socketId is: %s, nspName: %s",
                         socket.id, socket.nsp.name)
                     this._hdlSocketConn(_nsp, socket, cfg)
@@ -214,91 +179,16 @@ class SocketioWrapper {
             }
             // send an timeout error to client
             logger.error("connection refused: auth timeout")
-            socket.emit(_logicErrorEvt, new Error(getMessage(codes.AuthTimeout)))
+            socket.emit(builtinEvts.LogicErr, genSocketioErr(codes.AuthTimeout))
             socket.disconnect(true)
         }, 5000)
 
         // hdl disconnect evt
-        socket.on("disconnect", () => {
-            logger.info("a socket disconnected, and it's socketId is: ", socket.id, "args: ", null)
-
-            let _socket = this._sockets.get(socket.id)
-            if (_socket) {
-                // if has authed
-                socket.leaveAll()
-                // remove from _sockets
-                this._sockets.delete(socket.id)
-                // call onoff emitter
-                let onoff = new OnoffMsg(_socket.getToken(), _socket.getMeta(), EventType.Off, socket.id, socket.handshake.address)
-                this._onoffEmitter.on(_nsp.name, onoff)
-
-                // call session manager
-                try {
-                    this._sm.delBySocketId(socket.id)
-                } catch (error) {
-                    logger.error("could not delete session, ", error)
-                }
-            }
-        })
-
-        socket.on("auth", async (req: AuthReq) => {
-            logger.info("auth socketId: ", socket.id, "args:", req)
-            // call Auth Logic
-            let reply = this._auth.verify(req)
-            socket.emit("auth/reply", reply)
-
-            if (reply.errcode == codes.OK) {
-                // true: auth success
-                // save socketid to socket and request meta
-                this._sockets.set(socket.id, new SocketWrapper(socket, req))
-                // call onoff emitter
-                let clientIp = socket.handshake.address
-                let onoff = new OnoffMsg(req.token, req.meta, EventType.On, socket.id, clientIp)
-                this._onoffEmitter.on(_nsp.name, onoff)
-                // call session manager
-                try {
-                    await this._sm.set(socket.id, _nsp.name, clientIp, req)
-                } catch (error) {
-                    logger.error("could not set session, ", error)
-                }
-            } else {
-                // auth failed
-                socket.disconnect(true)
-            }
-        })
-
-        socket.on("join", (req: IJoinRoomsReq) => {
-            logger.info("recv join evt: ", socket.id, req)
-            req.rooms.forEach(joinRoomReq => {
-                logger.info("socket join room", joinRoomReq.roomId)
-                socket.join(joinRoomReq.roomId)
-            })
-        })
-
-        socket.on("chat/users", (uMsgs: proto.IUsersMessage[]) => {
-            logger.info("chat/users recv msg: ", uMsgs)
-            uMsgs.forEach((msg: proto.IUsersMessage) => {
-                this._sm.queryByUserId(msg.userId, msg.nspName)
-                    .then((v: ISession) => {
-                        let _socket = this._sockets.get(v.socketId)
-                        if (_socket) {
-                            _socket.getSocket().emit(msg.msg.evt, msg.msg)
-                        }
-                    })
-                    .catch((err: Error) => {
-                        logger.error(`could not get session by userId=${msg.userId}, err=${err}`)
-                        return
-                    })
-            })
-        })
-
-        socket.on("chat/rooms", (rMsgs: proto.IRoomsMessage[]) => {
-            logger.info("recv broadcast_rooms msg", rMsgs)
-            // TODO: limits socket sending msg while it's been knockoutted
-            rMsgs.forEach((msg: proto.IRoomsMessage) => {
-                _nsp.in(msg.roomId).emit(msg.msg.evt, msg.msg)
-            })
-        })
+        socket.on(builtinEvts.Disconnect, getDisconnectEvtHdl(this, _nsp, socket))
+        socket.on(builtinEvts.Auth, getAuthEvtHdl(this, _nsp, socket))
+        socket.on(builtinEvts.Join, getJoinEvtHdl(this, _nsp, socket))
+        socket.on(builtinEvts.ChatWithUser, getChatusersEvthdl(this, _nsp, socket))
+        socket.on(builtinEvts.ChatInRoom, getChatroomsEvtHdl(this, _nsp, socket))
 
         // listening custom evt and mount
         cfg.listenEvts.forEach(evt => {
@@ -306,10 +196,9 @@ class SocketioWrapper {
                 if (!this._authed(socket.id)) {
                     // true: not authed client should not be allowed to send any msg
                     logger.error("connection refused: not authed")
-                    socket.emit(_logicErrorEvt, new Error("not authed"))
+                    socket.emit(builtinEvts.LogicErr, genSocketioErr(codes.NotAuthed))
                     return
                 }
-
                 // TODO: how to deal wtih these message, ignored ?
                 logger.info("evt: ", evt, "data: ", args)
             })
@@ -394,6 +283,7 @@ class SocketioWrapper {
                 logger.error(`could not get socket by socketId=${session.socketId}`)
                 return
             }
+            this._sockets.delete(session.socketId)
             _socket.getSocket().disconnect(true)
         } catch (error) {
             logger.error(`could not find session by userId=${userId}, err=${error}`)

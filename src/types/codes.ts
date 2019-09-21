@@ -6,6 +6,7 @@ export enum codes {
     ParamInvalid,
     TokenInvalid,
     AuthTimeout,
+    NotAuthed,
 }
 
 const _messages = new Map<number, string>();
@@ -16,6 +17,7 @@ const _messages = new Map<number, string>();
     m.set(codes.ParamInvalid, "param invalid")
     m.set(codes.TokenInvalid, "token invalid")
     m.set(codes.AuthTimeout, "auth timeout")
+    m.set(codes.NotAuthed, "not authed")
 
 }(_messages))
 
