@@ -126,7 +126,7 @@ class SocketioWrapper {
     // }
 
 
-    private _authed(socketId: string): boolean {
+    public authed(socketId: string): boolean {
         return (this._sockets.get(socketId) !== undefined)
     }
 
@@ -173,7 +173,7 @@ class SocketioWrapper {
     private _hdlSocketConn = (_nsp: io.Namespace, socket: io.Socket, cfg: INspConfig) => {
         // auth req timeout
         setTimeout(() => {
-            if (this._authed(socket.id)) {
+            if (this.authed(socket.id)) {
                 // has authed, break
                 return
             }
@@ -193,7 +193,7 @@ class SocketioWrapper {
         // listening custom evt and mount
         cfg.listenEvts.forEach(evt => {
             socket.on(evt, (...args: any[]) => {
-                if (!this._authed(socket.id)) {
+                if (!this.authed(socket.id)) {
                     // true: not authed client should not be allowed to send any msg
                     logger.error("connection refused: not authed")
                     socket.emit(builtinEvts.LogicErr, genSocketioErr(codes.NotAuthed))
@@ -238,7 +238,7 @@ class SocketioWrapper {
         nspName = addSlashLeft(nspName)
         const _nsp = this._nsps.get(nspName)
         if (!_nsp) {
-            logger.error(__filename, 332, "could not get nsp by name: ", nspName)
+            logger.error("could not get nsp by name: ", nspName)
             return
         }
 
@@ -255,11 +255,23 @@ class SocketioWrapper {
         nspName = addSlashLeft(nspName)
         const _nsp = this._nsps.get(nspName)
         if (!_nsp) {
-            logger.error(__filename, 349, "could not get nsp by name: ", nspName)
+            logger.error("could not get nsp by name: ", nspName)
             return
         }
-        msgs.forEach((uMsg: proto.IUsersMessage) => {
-            _nsp.in(uMsg.userId.toString()).emit(uMsg.msg.evt, uMsg.msg)
+
+        msgs.forEach(async (uMsg: proto.IUsersMessage) => {
+            try {
+                let session = await this._sm.queryByUserId(uMsg.userId, nspName)
+                let _socket = this._sockets.get(session.socketId)
+                if (!_socket) {
+                    logger.warn("could not find socket with userId: ", uMsg.userId)
+                    return
+                }
+                _socket.getSocket().emit(uMsg.msg.evt, uMsg.msg)
+            } catch (error) {
+                logger.error("could not send evt to user", nspName, uMsg.userId)
+            }
+            // _nsp.in(uMsg.userId.toString()).emit(uMsg.msg.evt, uMsg.msg)
         });
     }
 

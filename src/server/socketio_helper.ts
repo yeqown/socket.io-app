@@ -70,6 +70,7 @@ export const getDisconnectEvtHdl = (_this: SocketioWrapper, _nsp: io.Namespace, 
         logger.info("a socket disconnected, and it's socketId is: %s", socket.id)
         let _socket = _this._sockets.get(socket.id)
         if (_socket) {
+            // true: only the client will have socket which auths passed
             _socket.getSocket().leaveAll()
             _this._sockets.delete(socket.id) // remove from _sockets
             let onoff = genOnoffMsg(_socket.getToken(), _socket.getMeta(), EventType.Off, socket.id, socket.handshake.address)
@@ -96,16 +97,21 @@ export const getAuthEvtHdl = (_this: SocketioWrapper, _nsp: io.Namespace, socket
             try {
                 let session = await _this._sm.queryByUserId(req.userId, _nsp.name)
                 let _socket = _this._sockets.get(session.socketId)
-                if (!_socket) {
-                    logger.error(`could not get socket by socketId=${session.socketId}`)
-                    return
+                if (_socket) {
+                    // true: session and socket were found
+                    _this._sockets.delete(session.socketId)
+                    _socket.getSocket().emit(builtinEvts.LogicErr, genSocketioErr(codes.ServerErr, "you've logined at another place"))
+                    _socket.getSocket().disconnect(true)
+                    let onoff = genOnoffMsg(session.token, session.meta, EventType.Off, session.socketId, session.clientIp)
+                    _this._onoffEmitter.off(_nsp.name, onoff)
+                } else {
+                    // true: get session but there's no socket kept
+                    // maybe, server crashed or reboot
+                    logger.warn(`could not get socket by socketId=${session.socketId}`)
                 }
-                _this._sockets.delete(session.socketId)
-                _socket.getSocket().emit(builtinEvts.LogicErr, genSocketioErr(codes.ServerErr, "you've logined at another place"))
-                _socket.getSocket().disconnect(true)
-                await _this._sm.delBySocketId(_socket.getSocket().id)
-                let onoff = genOnoffMsg(_socket.getToken(), _socket.getMeta(), EventType.Off, _socket.getSocket().id, _socket.getSocket().handshake.address)
-                _this._onoffEmitter.off(_nsp.name, onoff)
+
+                // to cleare session
+                await _this._sm.delBySocketId(session.socketId)
             } catch (error) {
                 logger.warn("could query session by userId: %d", req.userId, error)
             }
@@ -130,6 +136,11 @@ export const getAuthEvtHdl = (_this: SocketioWrapper, _nsp: io.Namespace, socket
 export const getJoinEvtHdl = (_this: SocketioWrapper, _nsp: io.Namespace, socket: io.Socket): ((req: IJoinRoomsReq) => void) => {
     return (req: IJoinRoomsReq) => {
         logger.info("recv join evt: ", socket.id, req)
+        if (!_this.authed(socket.id)) {
+            // true: if not authed, throw an error
+            socket.emit(builtinEvts.LogicErr, genSocketioErr(codes.NotAuthed))
+            return
+        }
         req.rooms.forEach((joinRoomReq: IJoinRoomReq) => {
             logger.info("socket join room", joinRoomReq.roomId)
             socket.join(joinRoomReq.roomId)
@@ -140,6 +151,11 @@ export const getJoinEvtHdl = (_this: SocketioWrapper, _nsp: io.Namespace, socket
 export const getChatusersEvthdl = (_this: SocketioWrapper, _nsp: io.Namespace, socket: io.Socket): ((uMsgs: proto.IUsersMessage[]) => void) => {
     return (uMsgs: proto.IUsersMessage[]) => {
         logger.info("chat/users recv msg: ", uMsgs)
+        if (!_this.authed(socket.id)) {
+            // true: if not authed, throw an error
+            socket.emit(builtinEvts.LogicErr, genSocketioErr(codes.NotAuthed))
+            return
+        }
         uMsgs.forEach((msg: proto.IUsersMessage) => {
             _this._sm.queryByUserId(msg.userId, msg.nspName)
                 .then((v: ISession) => {
@@ -160,6 +176,11 @@ export const getChatroomsEvtHdl = (_this: SocketioWrapper, _nsp: io.Namespace, s
     return (rMsgs: proto.IRoomsMessage[]) => {
         logger.info("recv broadcast_rooms msg", rMsgs)
         // TODO: limits socket sending msg while it's been knockoutted
+        if (!_this.authed(socket.id)) {
+            // true: if not authed, throw an error
+            socket.emit(builtinEvts.LogicErr, genSocketioErr(codes.NotAuthed))
+            return
+        }
         rMsgs.forEach((msg: proto.IRoomsMessage) => {
             _nsp.in(msg.roomId).emit(msg.msg.evt, msg.msg)
         })

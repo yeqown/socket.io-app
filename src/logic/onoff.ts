@@ -1,5 +1,5 @@
 import { IOnoff } from '../types'
-import { getNowTimestamp } from '../utils'
+import { getNowTimestamp, addSlashLeft } from '../utils'
 import { logger } from '../utils/ins'
 import { RedisClient } from 'redis'
 
@@ -74,13 +74,20 @@ class OnoffEmitterBasedRedis implements IOnoffEmitter {
     off(nspName: string, data: IOnoff): void {
         let ch = OnoffEmitterBasedRedis._genTopic(nspName)
         // data.evtTyp = EventType.Off
-        this.rc.publish(ch, JSON.stringify(data), (err: Error | null, reply: number) => {
+        // this.rc.publish(ch, JSON.stringify(data), (err: Error | null, reply: number) => {
+        //     if (err) {
+        //         logger.error("could not publish to %s with err: %v", ch, err)
+        //         return
+        //     } else {
+        //         logger.info("publish to %s get result code: %d", ch, reply)
+        //     }
+        // })
+        this.rc.lpush(ch, JSON.stringify(data), (err: Error | null, reply: number) => {
             if (err) {
                 logger.error("could not publish to %s with err: %v", ch, err)
                 return
-            } else {
-                logger.info("publish to %s get result code: %d", ch, reply)
             }
+            logger.info("publish to %s get result code: %d", ch, reply)
         })
     }
 
@@ -93,13 +100,20 @@ class OnoffEmitterBasedRedis implements IOnoffEmitter {
         let ch = OnoffEmitterBasedRedis._genTopic(nspName)
 
         // data.evtTyp = EventType.On
-        this.rc.publish(ch, JSON.stringify(data), (err: Error | null, reply: number) => {
+        // this.rc.publish(ch, JSON.stringify(data), (err: Error | null, reply: number) => {
+        //     if (err) {
+        //         logger.error("could not publish to %s with err: %v", ch, err)
+        //         return
+        //     } else {
+        //         logger.info("publish to %s get result code: %d", ch, reply)
+        //     }
+        // })
+        this.rc.lpush(ch, JSON.stringify(data), (err: Error | null, reply: number) => {
             if (err) {
                 logger.error("could not publish to %s with err: %v", ch, err)
                 return
-            } else {
-                logger.info("publish to %s get result code: %d", ch, reply)
             }
+            logger.info("publish to %s get result code: %d", ch, reply)
         })
 
     }
@@ -113,7 +127,7 @@ class OnoffEmitterBasedRedis implements IOnoffEmitter {
             throw new Error("nspName could not be empty")
         }
 
-        return nspName + "/onoff"
+        return addSlashLeft(nspName) + "/onoff"
     }
 }
 
