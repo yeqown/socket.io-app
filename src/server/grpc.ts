@@ -37,6 +37,7 @@ interface broadcastUsersMeta {
 interface disconnectMeta {
     nspName: string
     userId: number
+    socketId: string
 }
 
 interface knockoutFromRoomMeta {
@@ -72,7 +73,7 @@ class gRPCService {
         this._sub = createClient(redisOpts)
     }
 
-    pubsubTopic = (): string => {
+    static pubsubTopic = (): string => {
         return "app#grpc:commands"
     }
 
@@ -92,7 +93,7 @@ class gRPCService {
                 break
             case rpcCommandEvt.disconnect:
                 let d4: disconnectMeta = command.meta as disconnectMeta
-                this._disconnect(d4.nspName, d4.userId)
+                this._disconnect(d4.nspName, d4.userId, d4.socketId)
                 break
             case rpcCommandEvt.knockout:
                 let d5: knockoutFromRoomMeta = command.meta as knockoutFromRoomMeta
@@ -122,7 +123,7 @@ class gRPCService {
             }
         })
 
-        this._sub.SUBSCRIBE(this.pubsubTopic())
+        this._sub.SUBSCRIBE(gRPCService.pubsubTopic())
     }
 
     /**
@@ -134,7 +135,7 @@ class gRPCService {
             evt: evt,
             meta: meta,
         }
-        this._pub.publish(this.pubsubTopic(), JSON.stringify(command))
+        this._pub.publish(gRPCService.pubsubTopic(), JSON.stringify(command))
     }
 
     serve = () => {
@@ -270,8 +271,8 @@ class gRPCService {
     }
 
 
-    _disconnect = (nspName: string, userId: number) => {
-        this._socketioSrv.deactiveByUserId(nspName, userId)
+    _disconnect = (nspName: string, userId: number, socketId: string) => {
+        this._socketioSrv.deactiveByUserId(nspName, userId, socketId)
     }
 
     /**
@@ -282,8 +283,9 @@ class gRPCService {
         let nspName = call.request.getNspname()
         let userId = call.request.getUserid()
         let resp = new api_pb.DisconnectResp()
+        let socketId = "" // TODO: can get param from rpc request
 
-        let meta: disconnectMeta = { nspName, userId }
+        let meta: disconnectMeta = { nspName, userId, socketId }
         this._publishCommandsToRedis(rpcCommandEvt.disconnect, meta)
 
         resp.setErrcode(codes.OK)
@@ -341,4 +343,4 @@ class gRPCService {
 
 }
 
-export { gRPCService }
+export { gRPCService, IRpcCommand, disconnectMeta, rpcCommandEvt }

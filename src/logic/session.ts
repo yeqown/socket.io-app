@@ -84,7 +84,14 @@ class SManagerBasedRedis implements ISessionManager {
      * @param socketId 
      */
     public async delBySocketId(socketId: string): Promise<any> {
-        let v = await this.queryBySocketId(socketId)
+        let v: ISession
+        try {
+            v = await this.queryBySocketId(socketId)
+        } catch (error) {
+            logger.error(`could not query session by socketId=${socketId}, `, error)
+            throw error
+        }
+
         const result = new Promise((resolve, reject) => {
             let multi = this.rc.multi()
             multi.del(SManagerBasedRedis._genSocketIdKey(socketId))
@@ -110,7 +117,13 @@ class SManagerBasedRedis implements ISessionManager {
      * @param nspName 
      */
     public async delByUserId(userId: number, nspName: string): Promise<any> {
-        let v = await this.queryByUserId(userId, nspName)
+        let v: ISession
+        try {
+            v = await this.queryByUserId(userId, nspName)
+        } catch (error) {
+            logger.error(`could not query session by userId=${userId}, `, error)
+            throw error
+        }
 
         // .then((v: ISession | Error) => {
         //     if (v instanceof Error) {
