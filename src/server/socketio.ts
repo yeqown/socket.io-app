@@ -5,13 +5,14 @@ import redisAdapter, { SocketIORedisOptions } from 'socket.io-redis'
 import express from 'express'
 import { Request, Response } from "express";
 import http from 'http'
-import { ClientOpts as RedisOpts } from 'redis'
+import { ClientOpts as RedisOpts, RedisClient, createClient } from 'redis'
 
-import { proto, SocketioOptions, ApiResponse } from '../types'
+import { proto, SocketioOptions, ApiResponse, ISession } from '../types'
 import { codes, getMessage, addSlashLeft } from '../utils'
 import { logger, mgoClient, redisClient } from '../utils/ins'
 import { ISessionManager, IOnoffEmitter, SManagerBasedRedis, OnoffEmitterBasedRedis, ITokenr, DesTokenr, INspConfiger, INspConfig, NspConfigRepo, NspConfig, } from '../logic'
 import { builtinEvts, getDisconnectEvtHdl, SocketWrapper, getAuthEvtHdl, getJoinEvtHdl, getChatusersEvthdl, getChatroomsEvtHdl, genSocketioErr } from './socketio_helper';
+import { IRpcCommand, rpcCommandEvt, gRPCService, disconnectMeta } from './grpc'
 
 /**
  * SocketioWrapper provides some simpe methods and calls logic
@@ -30,6 +31,7 @@ class SocketioWrapper {
     _nspConfiger: INspConfiger
     _onoffEmitter: IOnoffEmitter
     _auth: ITokenr
+    _pub: RedisClient
 
     _io: io.Server
     _httpSrv: http.Server
@@ -49,6 +51,7 @@ class SocketioWrapper {
         this._nspConfiger = new NspConfigRepo(mgoClient, opt.nspConfigOpt)
         this._onoffEmitter = new OnoffEmitterBasedRedis(redisClient)
         this._auth = new DesTokenr()
+        this._pub = createClient(redisOpts)
 
         this._nsps = new Map<string, io.Namespace>()
         this._sockets = new Map<string, SocketWrapper>()
@@ -84,46 +87,15 @@ class SocketioWrapper {
         })
     }
 
-    // /**
-    //  * creata an Nsp and listen evt on it
-    //  */
-    // createNsp = (nspCfg: INspConfig): Error | null => {
-    //     let _nsp = this._nsps.get(nspCfg.name)
-    //     if (_nsp === undefined) {
-
-    //         let err = new Error("duplicate nsp name")
-    //         logger.error("could not create a Nsp with error:", err)
-    //         return err
-    //     }
-
-    //     try {
-    //         this._nspConfiger.applyFor(nspCfg)
-    //     } catch (err) {
-    //         logger.error("coule not apply for a Nsp with error: ", err)
-    //         return err
-    //     }
-
-    //     return null
-    // }
-
-    // /**
-    //  * rmeove an Nsp [Nsp event & Nsp]
-    //  * @param nspName
-    //  */
-    // removeNsp = (nspName: string): Error | null => {
-    //     nspName = addSlashLeft(nspName)
-    //     let _nsp = this._nsps.get(nspName)
-    //     if (_nsp === undefined) {
-    //         let err = new Error("undefined nsp")
-    //         return err
-    //     }
-
-    //     _nsp.removeAllListeners()
-    //     this._nsps.delete(nspName)
-    //     delete this._io.nsps[nspName]
-
-    //     return null
-    // }
+    disconnectBroadcast(session: ISession): void {
+        logger.info("disconnectGlobal called")
+        let meta: disconnectMeta = { nspName: session.nsp, userId: session.userId, socketId: session.socketId }
+        let command: IRpcCommand = {
+            evt: rpcCommandEvt.disconnect,
+            meta: meta,
+        }
+        this._pub.publish(gRPCService.pubsubTopic(), JSON.stringify(command))
+    }
 
 
     public authed(socketId: string): boolean {
@@ -280,17 +252,32 @@ class SocketioWrapper {
      * deactiveByUserId disconnect
      * disconnect with client by userId
      */
-    deactiveByUserId = async (nspName: string, userId: number) => {
+    deactiveByUserId = async (nspName: string, userId: number, socketId: string) => {
         nspName = addSlashLeft(nspName)
         let _nsp = this._nsps.get(nspName)
         if (!_nsp) {
-            logger.error(__filename, 365, "could not find nsp by nspName=", nspName)
+            logger.error("could not find nsp by nspName=", nspName)
             return
         }
 
+        let _socket: SocketWrapper | undefined
+        if (socketId) {
+            _socket = this._sockets.get(socketId)
+
+            if (_socket) {
+                this._sockets.delete(socketId)
+                _socket.getSocket().disconnect(true)
+                return
+            }
+            // this means socketId is priority 1
+            return
+        }
+
+        logger.info("should not do here")
+        // could not get by socketId
         try {
             let session = await this._sm.queryByUserId(userId, nspName)
-            let _socket = this._sockets.get(session.socketId)
+            _socket = this._sockets.get(session.socketId)
             if (!_socket) {
                 logger.error(`could not get socket by socketId=${session.socketId}`)
                 return

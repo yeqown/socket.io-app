@@ -90,28 +90,31 @@ export const getAuthEvtHdl = (_this: SocketioWrapper, _nsp: io.Namespace, socket
         logger.info("auth socketId: ", socket.id, "args:", req)
         // call Auth Logic
         let reply = _this._auth.verify(req)
-        socket.emit(builtinEvts.AuthReply, reply)
+        // ISSUE: join but not authed
+        // socket.emit(builtinEvts.AuthReply, reply)
 
         if (reply.errcode == codes.OK) {
             // check user has logined ? if logined, then let the logined client offline
             try {
-                let session = await _this._sm.queryByUserId(req.userId, _nsp.name)
-                let _socket = _this._sockets.get(session.socketId)
+                // if miss session, this will throw an Error
+                let oldSession = await _this._sm.queryByUserId(req.userId, _nsp.name)
+                // to clear oldSession
+                await _this._sm.delByUserId(req.userId, _nsp.name)
+
+                let _socket = _this._sockets.get(oldSession.socketId)
                 if (_socket) {
-                    // true: session and socket were found
-                    _this._sockets.delete(session.socketId)
+                    // true: oldSession and socket were found
+                    _this._sockets.delete(oldSession.socketId)
                     _socket.getSocket().emit(builtinEvts.LogicErr, genSocketioErr(codes.ServerErr, "you've logined at another place"))
                     _socket.getSocket().disconnect(true)
-                    let onoff = genOnoffMsg(session.token, session.meta, EventType.Off, session.socketId, session.clientIp)
-                    _this._onoffEmitter.off(_nsp.name, onoff)
+                    // let onoff = genOnoffMsg(oldSession.token, oldSession.meta, EventType.Off, oldSession.socketId, oldSession.clientIp)
+                    // _this._onoffEmitter.off(_nsp.name, onoff)
                 } else {
-                    // true: get session but there's no socket kept
+                    // true: get oldSession but there's no socket kept
                     // maybe, server crashed or reboot
-                    logger.warn(`could not get socket by socketId=${session.socketId}`)
+                    logger.warn(`could not get socket by socketId=${oldSession.socketId}`)
+                    _this.disconnectBroadcast(oldSession)
                 }
-
-                // to cleare session
-                await _this._sm.delBySocketId(session.socketId)
             } catch (error) {
                 logger.warn("could query session by userId: %d", req.userId, error)
             }
@@ -120,9 +123,14 @@ export const getAuthEvtHdl = (_this: SocketioWrapper, _nsp: io.Namespace, socket
                 // check userId online, if online, deactive another client
                 _this._sockets.set(socket.id, new SocketWrapper(socket, req))
                 let clientIp = socket.handshake.address
-                let onoff = genOnoffMsg(req.token, req.meta, EventType.On, socket.id, clientIp)
-                _this._onoffEmitter.on(_nsp.name, onoff)
+                // To make sure the off message is faster than online message
+                // Remember to upper the 1500 to an proper value, so that your distribute-system can work well
+                setTimeout(() => {
+                    let onoff = genOnoffMsg(req.token, req.meta, EventType.On, socket.id, clientIp)
+                    _this._onoffEmitter.on(_nsp.name, onoff)
+                }, 1500)
                 _this._sm.set(socket.id, _nsp.name, clientIp, req)
+                socket.emit(builtinEvts.AuthReply, reply)
             } catch (error) {
                 logger.error("could not set session, ", error)
             }
