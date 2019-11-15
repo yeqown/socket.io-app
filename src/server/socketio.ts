@@ -269,7 +269,7 @@ class SocketioWrapper {
                 _socket.getSocket().disconnect(true)
                 return
             }
-
+            // this means socketId is priority 1
             return
         }
 

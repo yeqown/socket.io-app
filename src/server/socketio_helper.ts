@@ -123,8 +123,12 @@ export const getAuthEvtHdl = (_this: SocketioWrapper, _nsp: io.Namespace, socket
                 // check userId online, if online, deactive another client
                 _this._sockets.set(socket.id, new SocketWrapper(socket, req))
                 let clientIp = socket.handshake.address
-                let onoff = genOnoffMsg(req.token, req.meta, EventType.On, socket.id, clientIp)
-                _this._onoffEmitter.on(_nsp.name, onoff)
+                // To make sure the off message is faster than online message
+                // Remember to upper the 1500 to an proper value, so that your distribute-system can work well
+                setTimeout(() => {
+                    let onoff = genOnoffMsg(req.token, req.meta, EventType.On, socket.id, clientIp)
+                    _this._onoffEmitter.on(_nsp.name, onoff)
+                }, 1500)
                 _this._sm.set(socket.id, _nsp.name, clientIp, req)
                 socket.emit(builtinEvts.AuthReply, reply)
             } catch (error) {
