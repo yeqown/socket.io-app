@@ -7,9 +7,9 @@ import { proto, GrpcServerOptions, codes, getMessage } from "../types";
 import { RedisClient, createClient, ClientOpts as RedisOpts } from "redis";
 
 enum rpcCommandEvt {
-    nspBroadcast = "nspbroadcast",
-    nspBroadcastRooms = "nspbroadcastrooms",
-    nspBroadcastUsers = "nspbroadcastusers",
+    // nspBroadcast = "nspbroadcast",
+    // nspBroadcastRooms = "nspbroadcastrooms",
+    // nspBroadcastUsers = "nspbroadcastusers",
     knockout = "knockout",
     disconnect = "disconnect",
     clearRooms = "clearrooms"
@@ -19,20 +19,20 @@ interface IRpcCommand {
     meta: any
 }
 
-interface broadcastMeta {
-    nspName: string
-    msg: proto.IMessage
-}
+// interface broadcastMeta {
+//     nspName: string
+//     msg: proto.IMessage
+// }
 
-interface broadcastRoomsMeta {
-    nspName: string
-    msgs: proto.IRoomsMessage[]
-}
+// interface broadcastRoomsMeta {
+//     nspName: string
+//     msgs: proto.IRoomsMessage[]
+// }
 
-interface broadcastUsersMeta {
-    nspName: string
-    msgs: proto.IUsersMessage[]
-}
+// interface broadcastUsersMeta {
+//     nspName: string
+//     msgs: proto.IUsersMessage[]
+// }
 
 interface disconnectMeta {
     nspName: string
@@ -79,18 +79,18 @@ class gRPCService {
 
     private _call(command: IRpcCommand) {
         switch (command.evt) {
-            case rpcCommandEvt.nspBroadcast:
-                let d1: broadcastMeta = command.meta as broadcastMeta
-                this._nspBroadcast(d1.nspName, d1.msg)
-                break
-            case rpcCommandEvt.nspBroadcastRooms:
-                let d2: broadcastRoomsMeta = command.meta as broadcastRoomsMeta
-                this._nspRoomsBroadcast(d2.nspName, d2.msgs)
-                break
-            case rpcCommandEvt.nspBroadcastUsers:
-                let d3: broadcastUsersMeta = command.meta as broadcastUsersMeta
-                this._nspUsersBroadcast(d3.nspName, d3.msgs)
-                break
+            // case rpcCommandEvt.nspBroadcast:
+            //     let d1: broadcastMeta = command.meta as broadcastMeta
+            //     this._nspBroadcast(d1.nspName, d1.msg)
+            //     break
+            // case rpcCommandEvt.nspBroadcastRooms:
+            //     let d2: broadcastRoomsMeta = command.meta as broadcastRoomsMeta
+            //     this._nspRoomsBroadcast(d2.nspName, d2.msgs)
+            //     break
+            // case rpcCommandEvt.nspBroadcastUsers:
+            //     let d3: broadcastUsersMeta = command.meta as broadcastUsersMeta
+            //     this._nspUsersBroadcast(d3.nspName, d3.msgs)
+            //     break
             case rpcCommandEvt.disconnect:
                 let d4: disconnectMeta = command.meta as disconnectMeta
                 this._disconnect(d4.nspName, d4.userId, d4.socketId)
@@ -174,11 +174,12 @@ class gRPCService {
             return
         }
 
-        let meta: broadcastMeta = {
-            nspName,
-            msg: proto.loadFromPbMessage(msg)
-        }
-        this._publishCommandsToRedis(rpcCommandEvt.nspBroadcast, meta)
+        this._nspBroadcast(nspName, proto.loadFromPbMessage(msg))
+        // let meta: broadcastMeta = {
+        //     nspName,
+        //     msg: proto.loadFromPbMessage(msg)
+        // }
+        // this._publishCommandsToRedis(rpcCommandEvt.nspBroadcast, meta)
 
         logger.info("broadcast message: ", msg, msg.getId(), msg.getVer());
         resp.setErrcode(codes.OK)
@@ -223,8 +224,9 @@ class gRPCService {
             }
         })
 
-        let meta: broadcastRoomsMeta = { nspName, msgs: _msgs }
-        this._publishCommandsToRedis(rpcCommandEvt.nspBroadcastRooms, meta)
+        this._nspRoomsBroadcast(nspName, _msgs)
+        // let meta: broadcastRoomsMeta = { nspName, msgs: _msgs }
+        // this._publishCommandsToRedis(rpcCommandEvt.nspBroadcastRooms, meta)
 
         resp.setErrcode(codes.OK)
         resp.setErrmsg(getMessage(codes.OK))
@@ -262,8 +264,9 @@ class gRPCService {
             }
         })
 
-        let meta: broadcastUsersMeta = { nspName, msgs: _msgs }
-        this._publishCommandsToRedis(rpcCommandEvt.nspBroadcastUsers, meta)
+        this._nspUsersBroadcast(nspName, _msgs)
+        // let meta: broadcastUsersMeta = { nspName, msgs: _msgs }
+        // this._publishCommandsToRedis(rpcCommandEvt.nspBroadcastUsers, meta)
 
         resp.setErrcode(codes.OK)
         resp.setErrmsg(getMessage(codes.OK))
