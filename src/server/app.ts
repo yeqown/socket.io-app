@@ -3,16 +3,17 @@
 import io from 'socket.io'
 import redisAdapter, { SocketIORedisOptions } from 'socket.io-redis'
 import express from 'express'
-import { Request, Response } from "express";
+
 import http from 'http'
 import { ClientOpts as RedisOpts, RedisClient, createClient } from 'redis'
 
-import { proto, SocketioOptions, ApiResponse, ISession } from '../types'
+import { proto, SocketioOptions, ISession } from '../types'
 import { codes, getMessage, addSlashLeft } from '../utils'
 import { logger, mgoClient, redisClient } from '../utils/ins'
-import { ISessionManager, IOnoffEmitter, SManagerBasedRedis, OnoffEmitterBasedRedis, ITokenr, DesTokenr, INspConfiger, INspConfig, NspConfigRepo, NspConfig, } from '../logic'
-import { builtinEvts, getDisconnectEvtHdl, SocketWrapper, getAuthEvtHdl, getJoinEvtHdl, getChatusersEvthdl, getChatroomsEvtHdl, genSocketioErr } from './socketio_helper';
+import { ISessionManager, IOnoffEmitter, SManagerBasedRedis, OnoffEmitterBasedRedis, ITokenr, DesTokenr, INspConfiger, INspConfig, NspConfigRepo, NspConfig, IRoom } from '../logic'
+import { builtinEvts, getDisconnectEvtHdl, SocketWrapper, getAuthEvtHdl, getJoinEvtHdl, getChatusersEvthdl, getChatroomsEvtHdl, genSocketioErr } from './app_socket_helper';
 import { IRpcCommand, rpcCommandEvt, gRPCService, disconnectMeta } from './grpc'
+import { getHdlGetAllNsps, getHdlGetNsp, getHdlGenNsp, getHdlRemoveNsp, getHdlStatics, getHdlStaticsRoom, getHdlStaticsSockets } from './app_http_helper'
 
 /**
  * SocketioWrapper provides some simpe methods and calls logic
@@ -42,6 +43,7 @@ class SocketioWrapper {
     // only save authed socket, not authed or auth-failed socket will be disconnect, 
     // and not trigger online or offline evt
     _sockets: Map<string, SocketWrapper>
+    _rooms: Map<string, IRoom>
 
     constructor(opt: SocketioOptions, redisOpts: RedisOpts) {
         logger.info("init SocketioWrapper with opts: ", opt, redisOpts);
@@ -55,6 +57,7 @@ class SocketioWrapper {
 
         this._nsps = new Map<string, io.Namespace>()
         this._sockets = new Map<string, SocketWrapper>()
+        this._rooms = new Map<string, IRoom>()
 
         // create socketio server
         this._app = express()
@@ -119,7 +122,17 @@ class SocketioWrapper {
                 logger.info("generate nsp name: ", nspName, "evts:", cfg.listenEvts)
                 let _nsp = this._io.of(nspName)
 
-                // TODO: using middleware
+                // using middleware to refuse invalid nspName
+                _nsp.use((socket: io.Socket, next: (err?: any) => void) => {
+                    let nspName = addSlashLeft(socket.nsp.name)
+                    if (this._nsps.has(nspName)) {
+                        next()
+                        return
+                    }
+                    // if nsp not allowed, then refuse this client
+                    next(new Error("nsp not allowed"))
+                })
+
                 // handle connection to socket
                 _nsp.on(builtinEvts.Connection, (socket: io.Socket) => {
                     logger.info("a new socket incomming, and it's socketId is: %s, nspName: %s",
@@ -161,30 +174,6 @@ class SocketioWrapper {
         socket.on(builtinEvts.Join, getJoinEvtHdl(this, _nsp, socket))
         socket.on(builtinEvts.ChatWithUser, getChatusersEvthdl(this, _nsp, socket))
         socket.on(builtinEvts.ChatInRoom, getChatroomsEvtHdl(this, _nsp, socket))
-
-        // listening custom evt and mount
-        cfg.listenEvts.forEach(evt => {
-            socket.on(evt, (...args: any[]) => {
-                if (!this.authed(socket.id)) {
-                    // true: not authed client should not be allowed to send any msg
-                    logger.error("connection refused: not authed")
-                    socket.emit(builtinEvts.LogicErr, genSocketioErr(codes.NotAuthed))
-                    return
-                }
-                // TODO: how to deal wtih these message, ignored ?
-                logger.info("evt: ", evt, "data: ", args)
-            })
-        })
-    }
-
-    /**
-     * _mountHandlers, register handler to `app` typeof `express`
-     */
-    private _mountHandlers = () => {
-        this._app.get("/api/nsps/all", this.hdlGetAllNsps)
-        this._app.get("/api/nsps/:nspName", this.hdlGetNsp)
-        this._app.post("/api/nsps/gen", this.hdlGenNsp)
-        this._app.delete("/api/nsps/:nspName", this.hdlRemoveNsp)
     }
 
     /**
@@ -207,16 +196,22 @@ class SocketioWrapper {
      * broadcast msg to rooms
      */
     broadcastRooms = (nspName: string, msgs: proto.IRoomsMessage[]): void => {
-        nspName = addSlashLeft(nspName)
         const _nsp = this._nsps.get(nspName)
         if (!_nsp) {
             logger.error("could not get nsp by name: ", nspName)
             return
         }
 
+        logger.debug("SocketioWrapper.broadcastRooms, ", msgs)
         msgs.forEach((rMsg: proto.IRoomsMessage) => {
-            _nsp.in(rMsg.roomId).emit(rMsg.msg.evt, rMsg.msg)
+            let room = this._rooms.get(rMsg.roomId)
+            if (!room) {
+                logger.warn("SocketioWrapper.broadcastRooms failed to get room by roomId=%s", rMsg.roomId)
+                return
+            }
+            room.broadcast(rMsg.msg.evt, rMsg.msg)
         })
+
     }
 
     /**
@@ -318,6 +313,7 @@ class SocketioWrapper {
     /**
      * clearRooms
      * remove all clients' socket from room
+     * FIXME: clear clients in toom
      */
     clearRooms = (nspName: string, roomIds: string[]) => {
         nspName = addSlashLeft(nspName)
@@ -336,101 +332,24 @@ class SocketioWrapper {
                         if (err) { logger.error(`socketId=${socketId} could not leave roomId=${roomId} with err=${err}`); return }
                         logger.info(`socketId=${socketId} has leaved room roomId=${roomId}`)
                     })
+                    // TODO: alse leave this._rooms
                 })
             })
         })
     }
 
     /**
-     * TODO: add mroe nsp info
-     */
-    hdlGetAllNsps = async (req: Request, resp: Response) => {
-        let r = new ApiResponse()
-        try {
-            let cfgs = await this._nspConfiger.allNsp()
-            if (cfgs && cfgs.length) {
-                r.setErrcode(codes.OK)
-                r.setData(cfgs)
-                resp.json(r) && resp.end()
-            }
-        } catch (error) {
-            r.setErrcode(codes.ServerErr, error.message)
-            resp.json() && resp.end()
-            return
-        }
-    }
-
-    /**
-     * 
-     * TODO: add nsp monitor data
-     */
-    hdlGetNsp = async (req: Request, resp: Response) => {
-        let r = new ApiResponse()
-        let { nspName } = req.params
-
-        try {
-            let cfgs = await this._nspConfiger.allNsp()
-            let nsps = cfgs.filter((cfg: INspConfig) => {
-                return nspName === cfg.name
-            })
-
-            r.setErrcode(codes.OK)
-            r.setData(nsps)
-            resp.json(r) && resp.end()
-        } catch (error) {
-            r.setErrcode(codes.ServerErr)
-            resp.json() && resp.end()
-            return
-        }
-    }
-
-    /**
-     * hdlGenNsp generate an Nsp with config
-     * TODO: multi node to sync the nsp config, for now, you have to restart server manually
-     */
-    hdlGenNsp = async (req: Request, resp: Response) => {
-        logger.info(req.body)
-        let r = new ApiResponse()
-        let { nspName = '', evts } = req.body
-        if (nspName === '') {
-            r.setErrcode(codes.ParamInvalid, "nspName could not be empty")
-            resp.json(r) && resp.end()
-            return
-        }
-
-        if (typeof evts !== 'string' && !Array.isArray(evts)) {
-            r.setErrcode(codes.ParamInvalid, "evts type incorrect")
-            resp.json(r) && resp.end()
-            return
-        }
-
-        if (typeof evts === 'string') {
-            evts = [evts]
-        }
-
-        let cfg = new NspConfig(nspName, evts)
-        try {
-            await this._nspConfiger.applyFor(cfg)
-            r.setErrcode(codes.OK)
-            resp.json(r) && resp.end()
-            return
-        } catch (error) {
-            r.setErrcode(codes.ServerErr, error.message)
-            resp.json(r) && resp.end()
-            return
-        }
-    }
-
-    /**
-     * hdlRemoveNsp
-     * remove nsp config from nspConfiger
-     * TODO: multi node to sync nsp config
-     */
-    hdlRemoveNsp = (req: Request, resp: Response) => {
-        let { nspName } = req.params
-        resp.json("nspName")
-        resp.end()
-        return
+    * _mountHandlers, register handler to `app` typeof `express`
+    */
+    private _mountHandlers = () => {
+        this._app.post("/api/nsps/gen", getHdlGenNsp(this))
+        this._app.get("/api/nsps/all", getHdlGetAllNsps(this))
+        this._app.get("/api/nsps/:nspName", getHdlGetNsp(this))
+        this._app.delete("/api/nsps/:nspName", getHdlRemoveNsp(this))
+        // statics
+        this._app.get("/api/statics", getHdlStatics(this))
+        this._app.get("/api/statics/rooms", getHdlStaticsRoom(this))
+        this._app.get("/api/statics/sockets", getHdlStaticsSockets(this))
     }
 }
 
