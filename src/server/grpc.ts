@@ -2,12 +2,12 @@ import grpc, { GrpcObject } from "grpc"
 import grpc_pb from '../codegen/api/api_grpc_pb'
 import api_pb from "../codegen/api/api_pb";
 import { logger } from '../utils/ins'
-import { SocketioWrapper } from "./socketio";
+import { SocketioWrapper } from "./app";
 import { proto, GrpcServerOptions, codes, getMessage } from "../types";
 import { RedisClient, createClient, ClientOpts as RedisOpts } from "redis";
 
 enum rpcCommandEvt {
-    nspBroadcast = "nspbroadcast",
+    // nspBroadcast = "nspbroadcast",
     nspBroadcastRooms = "nspbroadcastrooms",
     nspBroadcastUsers = "nspbroadcastusers",
     knockout = "knockout",
@@ -19,10 +19,10 @@ interface IRpcCommand {
     meta: any
 }
 
-interface broadcastMeta {
-    nspName: string
-    msg: proto.IMessage
-}
+// interface broadcastMeta {
+//     nspName: string
+//     msg: proto.IMessage
+// }
 
 interface broadcastRoomsMeta {
     nspName: string
@@ -79,10 +79,10 @@ class gRPCService {
 
     private _call(command: IRpcCommand) {
         switch (command.evt) {
-            case rpcCommandEvt.nspBroadcast:
-                let d1: broadcastMeta = command.meta as broadcastMeta
-                this._nspBroadcast(d1.nspName, d1.msg)
-                break
+            // case rpcCommandEvt.nspBroadcast:
+            //     let d1: broadcastMeta = command.meta as broadcastMeta
+            //     this._nspBroadcast(d1.nspName, d1.msg)
+            //     break
             case rpcCommandEvt.nspBroadcastRooms:
                 let d2: broadcastRoomsMeta = command.meta as broadcastRoomsMeta
                 this._nspRoomsBroadcast(d2.nspName, d2.msgs)
@@ -174,11 +174,12 @@ class gRPCService {
             return
         }
 
-        let meta: broadcastMeta = {
-            nspName,
-            msg: proto.loadFromPbMessage(msg)
-        }
-        this._publishCommandsToRedis(rpcCommandEvt.nspBroadcast, meta)
+        this._nspBroadcast(nspName, proto.loadFromPbMessage(msg))
+        // let meta: broadcastMeta = {
+        //     nspName,
+        //     msg: proto.loadFromPbMessage(msg)
+        // }
+        // this._publishCommandsToRedis(rpcCommandEvt.nspBroadcast, meta)
 
         logger.info("broadcast message: ", msg, msg.getId(), msg.getVer());
         resp.setErrcode(codes.OK)
@@ -190,13 +191,6 @@ class gRPCService {
      * std call
      */
     _nspRoomsBroadcast = (nspName: string, msgs: proto.IRoomsMessage[]) => {
-        // fill _msg.getMsg() into RoomsMessage
-        // let newMsgs = msgs.map((msg: proto.IRoomsMessage): proto.IRoomsMessage => {
-        //     // if (!_msg) return null
-        //     return new proto.RoomsMessage(nspName, msg.getRoomid(),
-        //         new proto.Message().loadFromPb(msg.getMsg()))
-        // })
-
         this._socketioSrv.broadcastRooms(nspName, msgs)
     }
 
@@ -223,6 +217,7 @@ class gRPCService {
             }
         })
 
+        // this._nspRoomsBroadcast(nspName, _msgs)
         let meta: broadcastRoomsMeta = { nspName, msgs: _msgs }
         this._publishCommandsToRedis(rpcCommandEvt.nspBroadcastRooms, meta)
 
@@ -232,12 +227,6 @@ class gRPCService {
     }
 
     _nspUsersBroadcast = (nspName: string, msgs: proto.IUsersMessage[]) => {
-        // fill _msg.getMsg() into UsersMessage
-        // let newMsgs = msgs.map((msg: api_pb.UserMessage) => {
-        //     return new proto.UsersMessage(nspName, msg.getUserid(),
-        //         new proto.Message().loadFromPb(msg.getMsg()))
-        // })
-
         this._socketioSrv.broadcastUsers(nspName, msgs)
     }
 
@@ -262,6 +251,7 @@ class gRPCService {
             }
         })
 
+        // this._nspUsersBroadcast(nspName, _msgs)
         let meta: broadcastUsersMeta = { nspName, msgs: _msgs }
         this._publishCommandsToRedis(rpcCommandEvt.nspBroadcastUsers, meta)
 

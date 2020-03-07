@@ -1,9 +1,9 @@
-import { SocketioWrapper } from "./socketio"
+import { SocketioWrapper } from "./app"
 import io from 'socket.io'
 
-import { EventType, genOnoffMsg } from '../logic'
+import { EventType, genOnoffMsg, IRoom, RoomWithAck } from '../logic'
 import { logger } from '../utils/ins'
-import { proto, IJoinRoomsReq, IJoinRoomReq, AuthReq, IAuthReq, SocketioOptions, ISession, ApiResponse, codes, getMessage } from '../types'
+import { proto, IJoinRoomsReq, AuthReq, IAuthReq, ISession, codes, getMessage } from '../types'
 
 export class SocketWrapper {
     private _socket: io.Socket
@@ -71,16 +71,28 @@ export const getDisconnectEvtHdl = (_this: SocketioWrapper, _nsp: io.Namespace, 
         let _socket = _this._sockets.get(socket.id)
         if (_socket) {
             // true: only the client will have socket which auths passed
-            _socket.getSocket().leaveAll()
-            _this._sockets.delete(socket.id) // remove from _sockets
             let onoff = genOnoffMsg(_socket.getToken(), _socket.getMeta(), EventType.Off, socket.id, socket.handshake.address)
-            _this._onoffEmitter.off(_nsp.name, onoff) // call onoff emitter
+            _this._onoffEmitter.off(_nsp.name, onoff)
+
             try {
                 // call session manager
                 _this._sm.delBySocketId(socket.id)
             } catch (error) {
                 logger.error("could not delete session, ", error)
             }
+
+            // release memory
+            _socket.getSocket().leaveAll()              // leave room, not necessary
+            _socket.getSocket().removeAllListeners()    // remove event listener
+            _this._sockets.delete(socket.id)            // release map
+            let userId = _socket.getUserId()            // release user from custom room
+            _this._rooms.forEach((room: IRoom, roomId: string) => {
+                room.leave(userId)
+                if (room.isEmpty()) {
+                    logger.info("roomwithack been released, socketId=%s", socket.id)
+                    _this._rooms.delete(roomId)
+                }
+            })
         }
     }
 }
@@ -129,7 +141,12 @@ export const getAuthEvtHdl = (_this: SocketioWrapper, _nsp: io.Namespace, socket
                     let onoff = genOnoffMsg(req.token, req.meta, EventType.On, socket.id, clientIp)
                     _this._onoffEmitter.on(_nsp.name, onoff)
                 }, 1500)
-                _this._sm.set(socket.id, _nsp.name, clientIp, req)
+
+                if (socket.connected) {
+                    // true: socket still connected
+                    _this._sm.set(socket.id, _nsp.name, clientIp, req)
+                }
+
                 socket.emit(builtinEvts.AuthReply, reply)
             } catch (error) {
                 logger.error("could not set session, ", error)
@@ -149,9 +166,21 @@ export const getJoinEvtHdl = (_this: SocketioWrapper, _nsp: io.Namespace, socket
             socket.emit(builtinEvts.LogicErr, genSocketioErr(codes.NotAuthed))
             return
         }
-        req.rooms.forEach((joinRoomReq: IJoinRoomReq) => {
-            logger.info("socket join room", joinRoomReq.roomId)
-            socket.join(joinRoomReq.roomId)
+
+        req.rooms.forEach(joinRoomReq => {
+            logger.info("getJoinEvtHdl socket join room", joinRoomReq.roomId)
+            // socket.join(joinRoomReq.roomId)
+            let room = _this._rooms.get(joinRoomReq.roomId)
+            if (!room) {
+                room = new RoomWithAck(joinRoomReq.roomId)
+                _this._rooms.set(joinRoomReq.roomId, room)
+            }
+
+            let sw = _this._sockets.get(socket.id)
+            if (room && sw) {
+                room.join(sw.getUserId(), socket)
+            }
+            // _this._rooms
         })
     }
 }

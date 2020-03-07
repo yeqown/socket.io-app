@@ -9,9 +9,9 @@ enum EventType {
     Off = "disconnect",
 }
 
-interface EvtFunc {
-    (data: IOnoff): Error | null
-}
+// interface EvtFunc {
+//     (data: IOnoff): Error | null
+// }
 
 interface IOnoffEmitter {
     /**
@@ -41,23 +41,21 @@ const genOnoffMsg = (token: string, meta: any, evtTyp: EventType,
     }
 }
 
-class OnoffEmitterBasedMQ implements IOnoffEmitter {
-    _mqConn: any
+// class OnoffEmitterBasedMQ implements IOnoffEmitter {
+//     _mqConn: any
 
-    constructor() {
-        this._mqConn = null
-    }
+//     constructor() {
+//         this._mqConn = null
+//     }
 
-    off(nspName: string, data: IOnoff) {
-        // TODO:
-        throw new Error("Method not implemented.")
-    }
+//     off(nspName: string, data: IOnoff) {
+//         throw new Error("Method not implemented.")
+//     }
 
-    on(nspName: string, data: IOnoff) {
-        // TODO:
-        throw new Error("Method not implemented.")
-    }
-}
+//     on(nspName: string, data: IOnoff) {
+//         throw new Error("Method not implemented.")
+//     }
+// }
 
 class OnoffEmitterBasedRedis implements IOnoffEmitter {
     rc: RedisClient
@@ -73,15 +71,6 @@ class OnoffEmitterBasedRedis implements IOnoffEmitter {
      */
     off(nspName: string, data: IOnoff): void {
         let ch = OnoffEmitterBasedRedis._genTopic(nspName)
-        // data.evtTyp = EventType.Off
-        // this.rc.publish(ch, JSON.stringify(data), (err: Error | null, reply: number) => {
-        //     if (err) {
-        //         logger.error("could not publish to %s with err: %v", ch, err)
-        //         return
-        //     } else {
-        //         logger.info("publish to %s get result code: %d", ch, reply)
-        //     }
-        // })
         this.rc.lpush(ch, JSON.stringify(data), (err: Error | null, reply: number) => {
             if (err) {
                 logger.error("could not publish to %s with err: %v", ch, err)
@@ -98,16 +87,6 @@ class OnoffEmitterBasedRedis implements IOnoffEmitter {
      */
     on(nspName: string, data: IOnoff): void {
         let ch = OnoffEmitterBasedRedis._genTopic(nspName)
-
-        // data.evtTyp = EventType.On
-        // this.rc.publish(ch, JSON.stringify(data), (err: Error | null, reply: number) => {
-        //     if (err) {
-        //         logger.error("could not publish to %s with err: %v", ch, err)
-        //         return
-        //     } else {
-        //         logger.info("publish to %s get result code: %d", ch, reply)
-        //     }
-        // })
         this.rc.lpush(ch, JSON.stringify(data), (err: Error | null, reply: number) => {
             if (err) {
                 logger.error("could not publish to %s with err: %v", ch, err)

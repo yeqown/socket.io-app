@@ -1,5 +1,5 @@
 import { gRPCService } from './grpc'
-import { SocketioWrapper } from './socketio'
+import { SocketioWrapper } from './app'
 // import { IRedisClientAsync } from 'src/types'
 import { ClientOpts } from 'redis'
 import { GrpcServerOptions, SocketioOptions } from '../types'

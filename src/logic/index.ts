@@ -6,3 +6,5 @@ import { ITokenr, DesTokenr } from './auth'
 export { ITokenr, DesTokenr, }
 import { INspConfig, INspConfiger, NspConfigRepo, NspConfig } from './nsp_config'
 export { INspConfig, INspConfiger, NspConfigRepo, NspConfig }
+import { IRoom, RoomWithAck } from './room'
+export { IRoom, RoomWithAck }
