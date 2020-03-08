@@ -244,10 +244,10 @@ class SocketioWrapper {
 
 
     /**
-     * deactiveByUserId disconnect
-     * disconnect with client by userId
+     * deactiveUser disconnect
+     * disconnect with client by userId or socketId
      */
-    deactiveByUserId = async (nspName: string, userId: number, socketId: string) => {
+    deactiveUser = async (nspName: string, userId: number, socketId: string) => {
         nspName = addSlashLeft(nspName)
         let _nsp = this._nsps.get(nspName)
         if (!_nsp) {
@@ -255,30 +255,24 @@ class SocketioWrapper {
             return
         }
 
-        let _socket: SocketWrapper | undefined
         if (socketId) {
-            _socket = this._sockets.get(socketId)
-
+            // true: socketId is higher proority than userId
+            let _socket = this._sockets.get(socketId)
             if (_socket) {
-                this._sockets.delete(socketId)
                 _socket.getSocket().disconnect(true)
                 return
             }
-            // this means socketId is priority 1
             return
         }
 
-        logger.info("should not do here")
-        // could not get by socketId
+        // try to deactive user by userId 
         try {
             let session = await this._sm.queryByUserId(userId, nspName)
-            _socket = this._sockets.get(session.socketId)
-            if (!_socket) {
-                logger.error(`could not get socket by socketId=${session.socketId}`)
-                return
+            let _socket = this._sockets.get(session.socketId)
+            if (_socket) {
+                _socket.getSocket().disconnect(true)
             }
-            this._sockets.delete(session.socketId)
-            _socket.getSocket().disconnect(true)
+            return
         } catch (error) {
             logger.error(`could not find session by userId=${userId}, err=${error}`)
         }
@@ -318,21 +312,34 @@ class SocketioWrapper {
     clearRooms = (nspName: string, roomIds: string[]) => {
         nspName = addSlashLeft(nspName)
         const _nsp = this._nsps.get(nspName)
-        if (!_nsp) { logger.error(`could not find nsp by nspName=${nspName}`); return }
+        if (!_nsp) {
+            logger.error(`could not find nsp by nspName=${nspName}`)
+            return
+        }
 
         roomIds.forEach((roomId: string) => {
             logger.info("clear room with roomId=", roomId)
             _nsp.in(roomId).clients((err: Error, socketIds: string[]) => {
-                if (err) { logger.error("loop client get error: ", err, socketIds); return }
+                if (err) {
+                    logger.error("loop client get error: ", err, socketIds)
+                    return
+                }
+
+                // sockets leave room
                 socketIds.forEach((socketId: string) => {
                     let _socket = this._sockets.get(socketId)
-                    if (!_socket) { logger.error("could not get socket by socketId=", socketId); return }
+                    if (!_socket) {
+                        logger.error("could not get socket by socketId=", socketId)
+                        return
+                    }
                     _socket.getSocket().emit("logic/error", new Error(`you are removed from room=${roomId}`))
                     _socket.getSocket().leave(roomId, (err: Error) => {
-                        if (err) { logger.error(`socketId=${socketId} could not leave roomId=${roomId} with err=${err}`); return }
-                        logger.info(`socketId=${socketId} has leaved room roomId=${roomId}`)
+                        if (err) {
+                            logger.error(`socketId=${socketId} could not leave roomId=${roomId} with err=${err}`)
+                            return
+                        }
                     })
-                    // TODO: alse leave this._rooms
+                    // FIXME: also leave from this._rooms [custom room]
                 })
             })
         })

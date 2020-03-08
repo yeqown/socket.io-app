@@ -81,7 +81,6 @@ export const getHdlGenNsp = (_this: SocketioWrapper) => async (req: Request, res
     }
 }
 
-// TODO:
 export const getHdlRemoveNsp = (_this: SocketioWrapper) => async (req: Request, resp: Response) => {
     return async (req: Request, resp: Response) => {
         let { nspName } = req.params
@@ -90,7 +89,6 @@ export const getHdlRemoveNsp = (_this: SocketioWrapper) => async (req: Request, 
         return
     }
 }
-
 
 export const getHdlStatics = (_this: SocketioWrapper) => async (req: Request, resp: Response) => {
     return async (req: Request, resp: Response) => {

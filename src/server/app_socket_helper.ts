@@ -212,7 +212,7 @@ export const getChatusersEvthdl = (_this: SocketioWrapper, _nsp: io.Namespace, s
 export const getChatroomsEvtHdl = (_this: SocketioWrapper, _nsp: io.Namespace, socket: io.Socket): ((rMsgs: proto.IRoomsMessage[]) => void) => {
     return (rMsgs: proto.IRoomsMessage[]) => {
         logger.info("recv broadcast_rooms msg", rMsgs)
-        // TODO: limits socket sending msg while it's been knockoutted
+        // FIXME: limits socket sending msg while it's been knockoutted
         if (!_this.authed(socket.id)) {
             // true: if not authed, throw an error
             socket.emit(builtinEvts.LogicErr, genSocketioErr(codes.NotAuthed))

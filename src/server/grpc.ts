@@ -262,7 +262,7 @@ class gRPCService {
 
 
     _disconnect = (nspName: string, userId: number, socketId: string) => {
-        this._socketioSrv.deactiveByUserId(nspName, userId, socketId)
+        this._socketioSrv.deactiveUser(nspName, userId, socketId)
     }
 
     /**
