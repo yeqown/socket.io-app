@@ -50,7 +50,7 @@
     "log4js": "^5.1.0",
     "mongodb": "^3.3.2",
     "redis": "^2.8.0",
-    "socket.io": "^2.2.0",
+    "socket.io": "^2.4.0",
     "socket.io-redis": "^5.2.0",
     "utf-8-validate": "^5.0.2",
     "uuid": "^3.3.3",
