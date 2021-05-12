@@ -46,7 +46,7 @@
     "bufferutil": "^4.0.1",
     "express": "^4.17.1",
     "google-protobuf": "^3.9.1",
-    "grpc": "^1.23.3",
+    "grpc": "^1.24.9",
     "log4js": "^5.1.0",
     "mongodb": "^3.3.2",
     "redis": "^2.8.0",
